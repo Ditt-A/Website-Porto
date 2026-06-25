@@ -240,7 +240,7 @@ const contactLinks: ContactLink[] = [
   },
   {
     label: 'LinkedIn',
-    href: 'https://www.linkedin.com/in/aditya-akbar-82a796274/',
+    href: 'https://www.linkedin.com/in/aditya-akkbbar/',
     viewBox: '0 0 24 24',
     paths: [
       'M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11.5H3V9.75Zm6.25 0h3.83v1.57h.05c.53-.95 1.84-1.96 3.79-1.96 4.05 0 4.8 2.66 4.8 6.12v5.77h-4v-5.12c0-1.22-.02-2.8-1.7-2.8-1.71 0-1.97 1.33-1.97 2.71v5.21h-4V9.75Z',
