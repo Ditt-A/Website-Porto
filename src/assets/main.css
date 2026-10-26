@@ -57,19 +57,11 @@
 }
 
 .tree-sway {
-  animation: treeSway 8s ease-in-out var(--wind-delay, -1s) infinite;
+  animation: treeSway var(--wind-duration, 5.8s) ease-in-out var(--wind-delay, -1s) infinite;
 }
 
 .grass-sway {
-  animation: grassSway 4.5s ease-in-out var(--wind-delay, -1s) infinite;
-}
-
-.landscape-hills use:nth-child(2n) {
-  --wind-delay: -2.6s;
-}
-
-.landscape-hills use:nth-child(3n) {
-  --wind-delay: -4.4s;
+  animation: grassSway var(--wind-duration, 2.8s) ease-in-out var(--wind-delay, -1s) infinite;
 }
 
 .portfolio-shell::after {
@@ -106,25 +98,34 @@
 
 .cursor-light {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  z-index: 0;
-  width: min(720px, 58vw);
-  height: min(720px, 58vw);
+  top: 0;
+  left: 0;
+  z-index: 69;
+  width: 1px;
+  height: 1px;
   pointer-events: none;
-  background:
-    radial-gradient(circle, rgba(76, 160, 240, 0.1), transparent 34%),
-    radial-gradient(circle, rgba(95, 113, 227, 0.08), transparent 54%);
-  border-radius: 50%;
-  filter: blur(22px);
-  opacity: 0.82;
-  transform: translate3d(
-    calc(-50% + var(--pointer-light-x, 0px)),
-    calc(-50% + var(--pointer-light-y, 0px)),
-    0
-  );
-  transition: transform 260ms ease-out;
+  opacity: var(--cursor-opacity, 0);
+  transform: translate3d(var(--cursor-x, -120px), var(--cursor-y, -120px), 0);
+  transition: opacity 160ms ease;
   mix-blend-mode: screen;
+}
+
+.cursor-light::before {
+  position: absolute;
+  top: 14px;
+  left: 11px;
+  width: 56px;
+  height: 42px;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(ellipse at 45% 42%, rgba(255, 255, 245, 0.92), rgba(184, 228, 255, 0.36) 26%, transparent 64%),
+    radial-gradient(ellipse at center, transparent 24%, rgba(255, 209, 149, 0.46) 42%, transparent 66%);
+  border-radius: 50%;
+  box-shadow: 0 0 14px rgba(185, 229, 255, 0.15);
+  opacity: var(--cursor-light-opacity, 0.38);
+  transform: translate3d(-50%, -50%, 0) rotate(-28deg) scale(var(--cursor-light-scale, 0.72));
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease;
 }
 
 .pointer-cursor {
@@ -141,66 +142,20 @@
   will-change: transform, opacity;
 }
 
-.cursor-ring,
-.cursor-dot,
-.cursor-label {
+.cursor-magnifier {
   position: absolute;
   top: 0;
   left: 0;
   display: block;
+  width: 64px;
+  height: 64px;
+  max-width: none;
   pointer-events: none;
-}
-
-.cursor-ring {
-  width: 44px;
-  height: 44px;
-  background: var(--cursor-ring-bg, rgba(247, 247, 248, 0.02));
-  border: 1px solid var(--cursor-ring-border, rgba(247, 247, 248, 0.54));
-  border-radius: 50%;
-  box-shadow:
-    0 0 24px rgba(255, 77, 24, 0.14),
-    inset 0 0 18px rgba(255, 255, 255, 0.05);
-  transform: translate3d(-50%, -50%, 0) scale(var(--cursor-ring-scale, 1));
-  transition:
-    background 220ms ease,
-    border-color 220ms ease,
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 220ms ease;
-  backdrop-filter: blur(2px);
-}
-
-.cursor-dot {
-  width: 8px;
-  height: 8px;
-  background: #f7f7f8;
-  border-radius: 50%;
-  box-shadow: 0 0 18px rgba(247, 247, 248, 0.44);
-  transform: translate3d(-50%, -50%, 0) scale(var(--cursor-dot-scale, 1));
-  transition:
-    background 180ms ease,
-    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.cursor-label {
-  padding: 5px 8px;
-  color: #050505;
-  font-size: 0.64rem;
-  font-weight: 900;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background: var(--color-orange);
-  border-radius: 999px;
-  opacity: 0;
-  transform: translate3d(16px, -28px, 0) scale(0.82);
-  transition:
-    opacity 180ms ease,
-    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.portfolio-shell:has(a:hover, button:hover, summary:hover, .project-card:hover, .stack-card:hover, .experience-item:hover, .service-item:hover, .focus-pills span:hover, .stat-item:hover) .cursor-label {
-  opacity: 1;
-  transform: translate3d(20px, -32px, 0) scale(1);
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(2, 15, 32, 0.3));
+  transform: translate3d(-40%, -40%, 0) scale(var(--cursor-tool-scale, 1));
+  transform-origin: 40% 40%;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ambient-stage {
@@ -2092,22 +2047,22 @@ summary:hover .rolling-text span {
 @keyframes treeSway {
   0%,
   100% {
-    transform: rotate(0.3deg);
+    transform: rotate(-1deg);
   }
 
   50% {
-    transform: rotate(1.8deg);
+    transform: rotate(4.5deg);
   }
 }
 
 @keyframes grassSway {
   0%,
   100% {
-    transform: skewX(-2deg);
+    transform: skewX(-3deg);
   }
 
   50% {
-    transform: skewX(-12deg);
+    transform: skewX(-24deg);
   }
 }
 
@@ -2160,22 +2115,15 @@ summary:hover .rolling-text span {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  body,
-  a,
-  button,
-  summary,
-  .focus-pills span,
-  .project-card,
-  .stack-card,
-  .experience-item,
-  .service-item,
-  .stat-item {
+  .portfolio-shell[data-custom-cursor="true"],
+  .portfolio-shell[data-custom-cursor="true"] * {
     cursor: none;
   }
 }
 
 @media (hover: none), (pointer: coarse) {
   .pointer-cursor,
+  .cursor-light,
   .glass-card::after {
     display: none;
   }
@@ -2394,6 +2342,11 @@ summary:hover .rolling-text span {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .pointer-cursor,
+  .cursor-light {
+    display: none;
+  }
+
   *,
   *::before,
   *::after {

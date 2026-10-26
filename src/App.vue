@@ -78,6 +78,39 @@ const skyObjects: SkyObject[] = [
   { id: 'sun', image: '/images/sky/sun.png', x: 0.88, mobileX: 0.83, y: 0.91, size: 330, aspectRatio: 1.5, rotation: 0, depth: -3, speed: 0.008, parallaxRange: 8, opacity: 0.5, duration: 10 },
 ]
 
+const hillTrees = {
+  distant: [
+    { shape: 'pine', placement: 'translate(145 105) scale(0.55)' },
+    { shape: 'pine', placement: 'translate(182 102) scale(0.4)' },
+    { shape: 'broadleaf', placement: 'translate(1335 112) scale(0.58)' },
+  ],
+  middle: [
+    { shape: 'broadleaf', placement: 'translate(320 185) scale(0.78)' },
+    { shape: 'pine', placement: 'translate(1120 193) scale(0.8)' },
+    { shape: 'pine', placement: 'translate(1165 193) scale(0.6)' },
+  ],
+  foreground: [
+    { shape: 'broadleaf', placement: 'translate(90 292) scale(1.05)' },
+    { shape: 'pine', placement: 'translate(1420 291) scale(0.78)' },
+    { shape: 'pine', placement: 'translate(1485 286) scale(1.08)' },
+  ],
+}
+
+const hillGrass = {
+  middle: [
+    'translate(225 202) scale(0.55)', 'translate(455 236) scale(0.48)',
+    'translate(690 279) scale(0.64)', 'translate(880 235) scale(0.5)',
+    'translate(1050 205) scale(0.56)', 'translate(1260 221) scale(0.46)',
+    'translate(1530 228) scale(0.62)',
+  ],
+  foreground: [
+    'translate(190 318) scale(0.95)', 'translate(400 291) scale(0.75)',
+    'translate(590 294) scale(1.05)', 'translate(820 318) scale(0.8)',
+    'translate(1000 293) scale(0.9)', 'translate(1230 316) scale(0.72)',
+    'translate(1360 332) scale(1.1)', 'translate(1550 305) scale(0.85)',
+  ],
+}
+
 const navItems = ['Home', 'About', 'Stack', 'Expertise', 'Experience', 'Projects', 'Contact']
 const sectionIds = navItems.map((item) => item.toLowerCase())
 
@@ -349,6 +382,7 @@ const cursorY = ref(0)
 const cursorVisible = ref(false)
 const cursorInteractive = ref(false)
 const cursorPressed = ref(false)
+const cursorAssetLoaded = ref(false)
 const prefersReducedMotion = ref(false)
 const spaceStage = ref<HTMLElement | null>(null)
 const spaceBounds = ref({ width: 0, height: 0, viewportHeight: 0 })
@@ -565,7 +599,7 @@ const updateScrollPosition = () => {
 const updatePointerPosition = (event: PointerEvent) => {
   if (prefersReducedMotion.value || event.pointerType === 'touch') return
 
-  cursorVisible.value = true
+  cursorVisible.value = cursorAssetLoaded.value && Boolean(finePointerPreference?.matches)
 
   if (event.target instanceof Element) {
     cursorInteractive.value = Boolean(event.target.closest(interactiveSelector))
@@ -596,6 +630,7 @@ const resetPointerPosition = () => {
   pointerY.value = 0
   cursorVisible.value = false
   cursorInteractive.value = false
+  cursorPressed.value = false
   pointerCard = null
   clearGlassGlare()
 }
@@ -630,23 +665,16 @@ const shellStyle = computed<Record<string, string>>(() => ({
   '--scroll-progress': scrollProgress.value.toFixed(4),
   '--pointer-x': pointerX.value.toFixed(3),
   '--pointer-y': pointerY.value.toFixed(3),
-  '--pointer-light-x': `${(pointerX.value * 22).toFixed(1)}vw`,
-  '--pointer-light-y': `${(pointerY.value * 18).toFixed(1)}vh`,
   '--pointer-soft-x': `${(pointerX.value * 18).toFixed(1)}px`,
   '--pointer-soft-y': `${(pointerY.value * 14).toFixed(1)}px`,
   '--pointer-soft-x-inverse': `${(pointerX.value * -18).toFixed(1)}px`,
   '--pointer-soft-y-inverse': `${(pointerY.value * -14).toFixed(1)}px`,
   '--cursor-x': `${cursorX.value.toFixed(1)}px`,
   '--cursor-y': `${cursorY.value.toFixed(1)}px`,
-  '--cursor-opacity': cursorVisible.value && !prefersReducedMotion.value ? '1' : '0',
-  '--cursor-ring-scale': cursorPressed.value ? '0.72' : cursorInteractive.value ? '1.85' : '1',
-  '--cursor-dot-scale': cursorPressed.value ? '0.55' : cursorInteractive.value ? '0.3' : '1',
-  '--cursor-ring-border': cursorInteractive.value
-    ? 'rgba(255, 77, 24, 0.72)'
-    : 'rgba(247, 247, 248, 0.54)',
-  '--cursor-ring-bg': cursorInteractive.value
-    ? 'rgba(255, 77, 24, 0.1)'
-    : 'rgba(247, 247, 248, 0.02)',
+  '--cursor-opacity': cursorAssetLoaded.value && cursorVisible.value && !prefersReducedMotion.value ? '1' : '0',
+  '--cursor-tool-scale': cursorPressed.value ? '0.94' : cursorInteractive.value ? '1.04' : '1',
+  '--cursor-light-scale': cursorPressed.value ? '0.6' : cursorInteractive.value ? '1.85' : '0.72',
+  '--cursor-light-opacity': cursorInteractive.value ? '0.72' : '0.38',
   '--grid-y': `${(scrollY.value * -0.08).toFixed(1)}px`,
   '--star-opacity': (prefersReducedMotion.value ? 0.75 : 0.75 * (1 - atmosphereProgress.value)).toFixed(3),
 }))
@@ -672,6 +700,7 @@ onMounted(() => {
   finePointerPreference = window.matchMedia('(hover: hover) and (pointer: fine)')
   updateMotionPreference()
   motionPreference.addEventListener('change', updateMotionPreference)
+  finePointerPreference.addEventListener('change', resetPointerPosition)
 
   updateAmbientBounds()
   ambientBoundsObserver = new ResizeObserver(updateAmbientBounds)
@@ -684,6 +713,7 @@ onMounted(() => {
   window.addEventListener('scroll', updateScrollPosition, { passive: true })
   window.addEventListener('pointermove', updatePointerPosition, { passive: true })
   window.addEventListener('pointerleave', resetPointerPosition)
+  window.addEventListener('blur', resetPointerPosition)
   window.addEventListener('pointerdown', setCursorPressed)
   window.addEventListener('pointerup', releaseCursorPressed)
   updateScrollPosition()
@@ -720,12 +750,14 @@ onUnmounted(() => {
   window.removeEventListener('scroll', updateScrollPosition)
   window.removeEventListener('pointermove', updatePointerPosition)
   window.removeEventListener('pointerleave', resetPointerPosition)
+  window.removeEventListener('blur', resetPointerPosition)
   window.removeEventListener('pointerdown', setCursorPressed)
   window.removeEventListener('pointerup', releaseCursorPressed)
   revealObserver?.disconnect()
   ambientBoundsObserver?.disconnect()
   sceneObserver?.disconnect()
   motionPreference?.removeEventListener('change', updateMotionPreference)
+  finePointerPreference?.removeEventListener('change', resetPointerPosition)
   clearGlassGlare()
 
   if (scrollFrame) {
@@ -739,15 +771,27 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="portfolio-shell" :style="shellStyle">
+  <div
+    class="portfolio-shell"
+    :style="shellStyle"
+    :data-custom-cursor="cursorAssetLoaded && cursorVisible && !prefersReducedMotion"
+  >
     <div class="scroll-progress" aria-hidden="true">
       <span></span>
     </div>
     <div class="cursor-light" aria-hidden="true"></div>
     <div class="pointer-cursor" aria-hidden="true">
-      <span class="cursor-ring"></span>
-      <span class="cursor-dot"></span>
-      <span class="cursor-label">open</span>
+      <img
+        class="cursor-magnifier"
+        src="/images/cursor/magnifier.png"
+        alt=""
+        width="192"
+        height="192"
+        decoding="async"
+        draggable="false"
+        @load="cursorAssetLoaded = true"
+        @error="cursorAssetLoaded = false"
+      />
     </div>
 
     <div ref="spaceStage" class="ambient-stage" aria-hidden="true">
@@ -788,24 +832,18 @@ onUnmounted(() => {
       <svg viewBox="0 0 1600 360" preserveAspectRatio="none">
         <defs>
           <g id="hill-pine">
-            <g class="tree-sway">
-              <path d="M-4 -36 H4 V1 H-4 Z" fill="#574733" />
-              <path d="M0 -98 L-24 -58 H-15 L-34 -31 H-22 L-40 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#246344" />
-              <path d="M0 -98 L0 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#1c573d" />
-            </g>
+            <path d="M-4 -36 H4 V1 H-4 Z" fill="#574733" />
+            <path d="M0 -98 L-24 -58 H-15 L-34 -31 H-22 L-40 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#246344" />
+            <path d="M0 -98 L0 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#1c573d" />
           </g>
           <g id="hill-broadleaf">
-            <g class="tree-sway">
-              <path d="M-5 -44 H5 V1 H-5 Z M-2 -29 L-17 -44 L-13 -48 L3 -34 Z" fill="#675039" />
-              <ellipse cx="-19" cy="-51" rx="24" ry="24" fill="#357b4f" />
-              <ellipse cx="17" cy="-53" rx="27" ry="26" fill="#286b45" />
-              <ellipse cx="-2" cy="-72" rx="28" ry="27" fill="#3b8555" />
-            </g>
+            <path d="M-5 -44 H5 V1 H-5 Z M-2 -29 L-17 -44 L-13 -48 L3 -34 Z" fill="#675039" />
+            <ellipse cx="-19" cy="-51" rx="24" ry="24" fill="#357b4f" />
+            <ellipse cx="17" cy="-53" rx="27" ry="26" fill="#286b45" />
+            <ellipse cx="-2" cy="-72" rx="28" ry="27" fill="#3b8555" />
           </g>
           <g id="hill-grass" fill="currentColor">
-            <g class="grass-sway">
-              <path d="M-2 0 Q-9 -9 -18 -13 Q-7 -12 2 0 Z M0 0 Q-5 -14 -1 -25 Q2 -12 4 0 Z M2 0 Q8 -19 17 -22 Q11 -10 6 0 Z M-4 0 Q-15 -3 -23 -8 Q-9 -6 1 0 Z M4 0 Q16 -10 25 -9 Q13 -4 8 0 Z" />
-            </g>
+            <path d="M-2 0 Q-9 -9 -18 -13 Q-7 -12 2 0 Z M0 0 Q-5 -14 -1 -25 Q2 -12 4 0 Z M2 0 Q8 -19 17 -22 Q11 -10 6 0 Z M-4 0 Q-15 -3 -23 -8 Q-9 -6 1 0 Z M4 0 Q16 -10 25 -9 Q13 -4 8 0 Z" />
           </g>
           <pattern id="hill-grass-texture" width="110" height="58" patternUnits="userSpaceOnUse">
             <use href="#hill-grass" transform="translate(24 36) scale(0.44)" color="#8dc07c" opacity="0.32" />
@@ -825,25 +863,27 @@ onUnmounted(() => {
           fill="url(#hill-distant)"
         />
         <g opacity="0.8">
-          <use href="#hill-pine" transform="translate(145 105) scale(0.55)" />
-          <use href="#hill-pine" transform="translate(182 102) scale(0.4)" />
-          <use href="#hill-broadleaf" transform="translate(1335 112) scale(0.58)" />
+          <g v-for="(tree, index) in hillTrees.distant" :key="tree.placement" :transform="tree.placement">
+            <g class="tree-sway" :style="{ '--wind-delay': `${-index * 1.1}s`, '--wind-duration': `${6.5 + index * 0.4}s` }">
+              <use :href="`#hill-${tree.shape}`" />
+            </g>
+          </g>
         </g>
         <path
           d="M0 230 C210 134 356 147 562 236 C780 329 966 139 1190 174 C1370 202 1470 236 1600 184 L1600 360 L0 360 Z"
           fill="#43976a"
         />
-        <use href="#hill-broadleaf" transform="translate(320 185) scale(0.78)" />
-        <use href="#hill-pine" transform="translate(1120 193) scale(0.8)" />
-        <use href="#hill-pine" transform="translate(1165 193) scale(0.6)" />
+        <g v-for="(tree, index) in hillTrees.middle" :key="tree.placement" :transform="tree.placement">
+          <g class="tree-sway" :style="{ '--wind-delay': `${-index * 1.3 - 1}s`, '--wind-duration': `${5.8 + index * 0.4}s` }">
+            <use :href="`#hill-${tree.shape}`" />
+          </g>
+        </g>
         <g color="#85bd7c" opacity="0.72">
-          <use href="#hill-grass" transform="translate(225 202) scale(0.55)" />
-          <use href="#hill-grass" transform="translate(455 236) scale(0.48)" />
-          <use href="#hill-grass" transform="translate(690 279) scale(0.64)" />
-          <use href="#hill-grass" transform="translate(880 235) scale(0.5)" />
-          <use href="#hill-grass" transform="translate(1050 205) scale(0.56)" />
-          <use href="#hill-grass" transform="translate(1260 221) scale(0.46)" />
-          <use href="#hill-grass" transform="translate(1530 228) scale(0.62)" />
+          <g v-for="(placement, index) in hillGrass.middle" :key="placement" :transform="placement">
+            <g class="grass-sway" :style="{ '--wind-delay': `${-index * 0.37}s`, '--wind-duration': `${2.4 + index % 3 * 0.4}s` }">
+              <use href="#hill-grass" />
+            </g>
+          </g>
         </g>
         <path
           d="M0 280 C220 333 370 214 610 262 C840 308 1010 233 1220 261 C1380 282 1480 302 1600 260 L1600 360 L0 360 Z"
@@ -854,18 +894,17 @@ onUnmounted(() => {
           fill="url(#hill-grass-texture)"
         />
         <g color="#92bf78" opacity="0.8">
-          <use href="#hill-grass" transform="translate(190 318) scale(0.95)" />
-          <use href="#hill-grass" transform="translate(400 291) scale(0.75)" />
-          <use href="#hill-grass" transform="translate(590 294) scale(1.05)" />
-          <use href="#hill-grass" transform="translate(820 318) scale(0.8)" />
-          <use href="#hill-grass" transform="translate(1000 293) scale(0.9)" />
-          <use href="#hill-grass" transform="translate(1230 316) scale(0.72)" />
-          <use href="#hill-grass" transform="translate(1360 332) scale(1.1)" />
-          <use href="#hill-grass" transform="translate(1550 305) scale(0.85)" />
+          <g v-for="(placement, index) in hillGrass.foreground" :key="placement" :transform="placement">
+            <g class="grass-sway" :style="{ '--wind-delay': `${-index * 0.43}s`, '--wind-duration': `${2.4 + index % 3 * 0.4}s` }">
+              <use href="#hill-grass" />
+            </g>
+          </g>
         </g>
-        <use href="#hill-broadleaf" transform="translate(90 292) scale(1.05)" />
-        <use href="#hill-pine" transform="translate(1420 291) scale(0.78)" />
-        <use href="#hill-pine" transform="translate(1485 286) scale(1.08)" />
+        <g v-for="(tree, index) in hillTrees.foreground" :key="tree.placement" :transform="tree.placement">
+          <g class="tree-sway" :style="{ '--wind-delay': `${-index * 1.1 - 2}s`, '--wind-duration': `${5.2 + index * 0.4}s` }">
+            <use :href="`#hill-${tree.shape}`" />
+          </g>
+        </g>
       </svg>
     </div>
 

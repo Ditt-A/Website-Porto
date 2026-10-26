@@ -38,3 +38,5 @@ Five realistic, transparent daytime sky decorations are stored in `sky/`:
 Their originals and generation prompts are in `C:\Users\USER\Downloads\WebPorto-Sky-Assets-Realistic`. They appear only in the lower sky area above the landscape, with bounded pointer and scroll movement.
 
 The generated AA favicon is served as `/favicon.ico` (16, 32, and 48 px), `/favicon-32.png`, and `/apple-touch-icon.png` (180 px). Its original artwork and prompt are in `C:\Users\USER\Downloads\WebPorto-Brand-Assets`.
+
+The magnifying-glass cursor artwork is `cursor/magnifier.png` (192 px, displayed at 64 CSS pixels). Its original transparent artwork and imagegen prompt are in `C:\Users\USER\Downloads\WebPorto-Cursor-Assets`. The lens center is the pointer hotspot, and the projected light grows over interactive elements. Native cursors remain available for touch/coarse pointers, reduced motion, or a failed image load.
