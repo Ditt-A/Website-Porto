@@ -51,6 +51,7 @@ type SpaceObject = {
   rotation: number
   depth: number
   speed: number
+  parallaxRange: number
   opacity: number
   duration: number
 }
@@ -61,20 +62,20 @@ type SkyObject = SpaceObject & {
 }
 
 const spaceObjects: SpaceObject[] = [
-  { id: 'planet', image: '/images/space/planet.png', x: 0.07, y: 0.045, size: 190, rotation: -8, depth: 14, speed: -0.045, opacity: 0.72, duration: 12 },
-  { id: 'moon', image: '/images/space/moon.png', x: 0.93, y: 0.3, size: 122, rotation: 12, depth: -11, speed: 0.03, opacity: 0.7, duration: 15 },
-  { id: 'asteroid', image: '/images/space/asteroid.png', x: 0.06, y: 0.52, size: 104, rotation: -16, depth: 10, speed: -0.035, opacity: 0.7, duration: 11 },
-  { id: 'satellite', image: '/images/space/satellite.png', x: 0.93, y: 0.7, size: 162, rotation: 10, depth: -14, speed: 0.04, opacity: 0.72, duration: 14 },
-  { id: 'comet', image: '/images/space/comet.png', x: 0.82, y: 0.03, size: 138, rotation: 10, depth: -10, speed: -0.025, opacity: 0.58, duration: 16 },
-  { id: 'nebula', image: '/images/space/nebula.png', x: 0.22, y: 0.86, size: 240, rotation: -4, depth: 8, speed: 0.025, opacity: 0.3, duration: 20 },
+  { id: 'planet', image: '/images/space/planet.png', x: 0.07, y: 0.045, size: 190, rotation: -8, depth: 14, speed: -0.045, parallaxRange: 40, opacity: 0.72, duration: 12 },
+  { id: 'moon', image: '/images/space/moon.png', x: 0.93, y: 0.3, size: 122, rotation: 12, depth: -7, speed: 0.02, parallaxRange: 22, opacity: 0.7, duration: 15 },
+  { id: 'asteroid', image: '/images/space/asteroid.png', x: 0.06, y: 0.52, size: 104, rotation: -16, depth: 16, speed: -0.075, parallaxRange: 58, opacity: 0.7, duration: 11 },
+  { id: 'satellite', image: '/images/space/satellite.png', x: 0.93, y: 0.7, size: 162, rotation: 10, depth: -14, speed: 0.05, parallaxRange: 42, opacity: 0.72, duration: 14 },
+  { id: 'comet', image: '/images/space/comet.png', x: 0.82, y: 0.03, size: 138, rotation: 10, depth: -10, speed: -0.03, parallaxRange: 30, opacity: 0.58, duration: 16 },
+  { id: 'nebula', image: '/images/space/nebula.png', x: 0.22, y: 0.86, size: 240, rotation: -4, depth: 4, speed: 0.012, parallaxRange: 14, opacity: 0.3, duration: 20 },
 ]
 
 const skyObjects: SkyObject[] = [
-  { id: 'cloud', image: '/images/sky/cloud.png', x: 0.1, mobileX: 0.2, y: 0.1, size: 420, aspectRatio: 2, rotation: -2, depth: 8, speed: 0.018, opacity: 0.42, duration: 24 },
-  { id: 'balloon', image: '/images/sky/balloon.png', x: 0.93, mobileX: 0.84, y: 0.32, size: 155, aspectRatio: 2 / 3, rotation: 3, depth: -10, speed: -0.022, opacity: 0.72, duration: 18 },
-  { id: 'plane', image: '/images/sky/plane.png', x: 0.07, mobileX: 0.18, y: 0.51, size: 245, aspectRatio: 1.5, rotation: -5, depth: 9, speed: 0.025, opacity: 0.6, duration: 22 },
-  { id: 'birds', image: '/images/sky/birds.png', x: 0.83, mobileX: 0.74, y: 0.71, size: 330, aspectRatio: 2, rotation: -3, depth: -7, speed: -0.018, opacity: 0.62, duration: 26 },
-  { id: 'sun', image: '/images/sky/sun.png', x: 0.88, mobileX: 0.83, y: 0.91, size: 330, aspectRatio: 1.5, rotation: 0, depth: -4, speed: 0.01, opacity: 0.5, duration: 30 },
+  { id: 'cloud', image: '/images/sky/cloud.png', x: 0.1, mobileX: 0.2, y: 0.1, size: 420, aspectRatio: 2, rotation: -2, depth: 16, speed: -0.12, parallaxRange: 72, opacity: 0.42, duration: 30 },
+  { id: 'balloon', image: '/images/sky/balloon.png', x: 0.93, mobileX: 0.84, y: 0.32, size: 155, aspectRatio: 2 / 3, rotation: 3, depth: -10, speed: -0.055, parallaxRange: 44, opacity: 0.72, duration: 18 },
+  { id: 'plane', image: '/images/sky/plane.png', x: 0.07, mobileX: 0.18, y: 0.51, size: 245, aspectRatio: 1.5, rotation: -2, depth: 9, speed: 0.035, parallaxRange: 28, opacity: 0.6, duration: 42 },
+  { id: 'birds', image: '/images/sky/birds.png', x: 0.83, mobileX: 0.74, y: 0.71, size: 330, aspectRatio: 2, rotation: 0, depth: -6, speed: -0.018, parallaxRange: 18, opacity: 0.62, duration: 56 },
+  { id: 'sun', image: '/images/sky/sun.png', x: 0.88, mobileX: 0.83, y: 0.91, size: 330, aspectRatio: 1.5, rotation: 0, depth: -3, speed: 0.008, parallaxRange: 8, opacity: 0.5, duration: 10 },
 ]
 
 const navItems = ['Home', 'About', 'Stack', 'Expertise', 'Experience', 'Projects', 'Contact']
@@ -353,11 +354,23 @@ const spaceStage = ref<HTMLElement | null>(null)
 const spaceBounds = ref({ width: 0, height: 0, viewportHeight: 0 })
 const skyStage = ref<HTMLElement | null>(null)
 const skyBounds = ref({ width: 0, height: 0, top: 0, viewportHeight: 0 })
+const atmosphereStage = ref<HTMLElement | null>(null)
+const atmosphereBounds = ref({ top: 0, height: 0, viewportHeight: 0 })
+const experienceTimeline = ref<HTMLOListElement | null>(null)
+const timelineProgress = ref(0)
+// Keep timeline state in data attributes so Vue preserves the observer's reveal class.
+const activeExperience = ref(-1)
 
 let scrollFrame = 0
 let pointerFrame = 0
 let revealObserver: IntersectionObserver | undefined
 let ambientBoundsObserver: ResizeObserver | undefined
+let sceneObserver: IntersectionObserver | undefined
+let motionPreference: MediaQueryList | undefined
+let finePointerPreference: MediaQueryList | undefined
+let activeGlareCard: HTMLElement | null = null
+let pointerCard: HTMLElement | null = null
+let timelineMetrics = { top: 0, height: 0, markers: [] as number[] }
 let latestPointer = { x: 0, y: 0, clientX: 0, clientY: 0 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
@@ -379,6 +392,27 @@ const updateAmbientBounds = () => {
       viewportHeight: window.innerHeight,
     }
   }
+
+  if (atmosphereStage.value) {
+    atmosphereBounds.value = {
+      top: atmosphereStage.value.getBoundingClientRect().top + window.scrollY,
+      height: atmosphereStage.value.clientHeight,
+      viewportHeight: window.innerHeight,
+    }
+  }
+
+  if (experienceTimeline.value) {
+    timelineMetrics = {
+      top: experienceTimeline.value.getBoundingClientRect().top + window.scrollY + 12,
+      height: experienceTimeline.value.clientHeight - 24,
+      markers: [...experienceTimeline.value.querySelectorAll<HTMLElement>('.timeline-entry')].map((entry) => {
+        const marker = entry.querySelector<HTMLElement>('.timeline-marker')
+        return entry.offsetTop + (marker?.offsetTop ?? 40) + (marker?.offsetHeight ?? 14) / 2 - 12
+      }),
+    }
+  }
+
+  updateScrollPosition()
 }
 
 const spaceObjectStyle = (object: SpaceObject): Record<string, string> => {
@@ -396,7 +430,7 @@ const spaceObjectStyle = (object: SpaceObject): Record<string, string> => {
     ? viewportHeight * 0.105 - size / 2
     : height * object.y - size / 2
   const localScroll = scrollY.value - Math.max(0, baseY - viewportHeight / 2)
-  const scrollShift = prefersReducedMotion.value ? 0 : clamp(localScroll * object.speed, -36, 36)
+  const scrollShift = prefersReducedMotion.value ? 0 : clamp(localScroll * object.speed, -object.parallaxRange, object.parallaxRange)
   const pointerShiftX = prefersReducedMotion.value ? 0 : pointerX.value * object.depth
   const pointerShiftY = prefersReducedMotion.value ? 0 : pointerY.value * object.depth * 0.7
   const x = clamp(baseX + pointerShiftX, inset, Math.max(inset, width - size - inset))
@@ -421,14 +455,16 @@ const skyObjectStyle = (object: SkyObject): Record<string, string> => {
   const compact = width <= 820
   const objectWidth = object.size * clamp(width / 1440, compact ? 0.46 : 0.6, 1)
   const objectHeight = objectWidth / object.aspectRatio
-  const angle = ((Math.abs(object.rotation) + 2) * Math.PI) / 180
-  // Include the rotated corners and floating motion when keeping assets inside the sky.
-  const insetX = 24 + Math.max(0, (objectWidth * Math.cos(angle) + objectHeight * Math.sin(angle) - objectWidth) / 2)
-  const insetY = 24 + Math.max(0, (objectHeight * Math.cos(angle) + objectWidth * Math.sin(angle) - objectHeight) / 2)
-  const baseX = width * (compact ? object.mobileX : object.x) - objectWidth / 2
+  const angle = ((Math.abs(object.rotation) + 3) * Math.PI) / 180
+  const drift = object.id === 'cloud' ? (compact ? 14 : 32) : 6
+  // Reserve the complete animated envelope, including the sun's pulse and balloon's bob.
+  const insetX = 24 + drift + objectWidth * 0.04 + Math.max(0, (objectWidth * Math.cos(angle) + objectHeight * Math.sin(angle) - objectWidth) / 2)
+  const insetY = 40 + objectHeight * 0.04 + Math.max(0, (objectHeight * Math.cos(angle) + objectWidth * Math.sin(angle) - objectHeight) / 2)
+  const flying = !prefersReducedMotion.value && (object.id === 'plane' || object.id === 'birds')
+  const baseX = flying ? insetX : width * (compact ? object.mobileX : object.x) - objectWidth / 2
   const baseY = height * object.y - objectHeight / 2
   const localScroll = scrollY.value - Math.max(0, top + baseY - viewportHeight / 2)
-  const scrollShift = prefersReducedMotion.value ? 0 : clamp(localScroll * object.speed, -24, 24)
+  const scrollShift = prefersReducedMotion.value ? 0 : clamp(localScroll * object.speed, -object.parallaxRange, object.parallaxRange)
   const pointerShiftX = prefersReducedMotion.value ? 0 : pointerX.value * object.depth
   const pointerShiftY = prefersReducedMotion.value ? 0 : pointerY.value * object.depth * 0.6
   const x = clamp(baseX + pointerShiftX, insetX, Math.max(insetX, width - objectWidth - insetX))
@@ -443,7 +479,43 @@ const skyObjectStyle = (object: SkyObject): Record<string, string> => {
     '--sky-opacity': String(object.opacity),
     '--sky-duration': `${object.duration}s`,
     '--sky-delay': `${-object.duration * 0.35}s`,
+    '--sky-drift': `${drift}px`,
+    '--sky-flight-distance': `${Math.max(0, width - objectWidth - insetX - x).toFixed(1)}px`,
   }
+}
+
+const atmosphereProgress = computed(() => {
+  const { top, height, viewportHeight } = atmosphereBounds.value
+  return height ? clamp((scrollY.value + viewportHeight * 0.65 - top) / height, 0, 1) : 0
+})
+
+const atmosphereStyle = computed<Record<string, string>>(() => {
+  const { top, height, viewportHeight } = atmosphereBounds.value
+  const localScroll = scrollY.value + viewportHeight * 0.5 - top - height * 0.5
+  const reduced = prefersReducedMotion.value
+
+  return {
+    '--haze-opacity': (reduced ? 0.55 : 0.3 + atmosphereProgress.value * 0.55).toFixed(3),
+    '--atmosphere-far-y': `${reduced ? 0 : clamp(localScroll * -0.035, -50, 50)}px`,
+    '--atmosphere-near-y': `${reduced ? 0 : clamp(localScroll * -0.1, -110, 110)}px`,
+  }
+})
+
+const clearGlassGlare = () => {
+  activeGlareCard?.style.setProperty('--glare-active', '0')
+  activeGlareCard = null
+}
+
+const updateGlassGlare = () => {
+  if (activeGlareCard !== pointerCard) clearGlassGlare()
+  if (!pointerCard || !finePointerPreference?.matches || prefersReducedMotion.value) return
+
+  activeGlareCard = pointerCard
+  const bounds = activeGlareCard.getBoundingClientRect()
+  if (!bounds.width || !bounds.height) return
+  activeGlareCard.style.setProperty('--glare-x', `${(clamp((latestPointer.clientX - bounds.left) / bounds.width, 0, 1) * 100).toFixed(2)}%`)
+  activeGlareCard.style.setProperty('--glare-y', `${(clamp((latestPointer.clientY - bounds.top) / bounds.height, 0, 1) * 100).toFixed(2)}%`)
+  activeGlareCard.style.setProperty('--glare-active', '1')
 }
 
 const interactiveSelector = [
@@ -469,6 +541,14 @@ const updateScrollPosition = () => {
     scrollY.value = window.scrollY
     scrollProgress.value = scrollable > 0 ? clamp(window.scrollY / scrollable, 0, 1) : 0
 
+    const timelineHead = scrollY.value + window.innerHeight * 0.62 - timelineMetrics.top
+    timelineProgress.value = timelineMetrics.height > 0 ? clamp(timelineHead / timelineMetrics.height, 0, 1) : 0
+    let reached = -1
+    timelineMetrics.markers.forEach((position, index) => {
+      if (timelineHead >= position) reached = index
+    })
+    activeExperience.value = reached
+
     sectionIds.forEach((id) => {
       const section = document.getElementById(id)
 
@@ -483,12 +563,13 @@ const updateScrollPosition = () => {
 }
 
 const updatePointerPosition = (event: PointerEvent) => {
-  if (prefersReducedMotion.value) return
+  if (prefersReducedMotion.value || event.pointerType === 'touch') return
 
   cursorVisible.value = true
 
   if (event.target instanceof Element) {
     cursorInteractive.value = Boolean(event.target.closest(interactiveSelector))
+    pointerCard = event.target.closest<HTMLElement>('.glass-card')
   }
 
   latestPointer = {
@@ -505,6 +586,7 @@ const updatePointerPosition = (event: PointerEvent) => {
     pointerY.value = clamp(latestPointer.y, -1, 1)
     cursorX.value = latestPointer.clientX
     cursorY.value = latestPointer.clientY
+    updateGlassGlare()
     pointerFrame = 0
   })
 }
@@ -514,6 +596,14 @@ const resetPointerPosition = () => {
   pointerY.value = 0
   cursorVisible.value = false
   cursorInteractive.value = false
+  pointerCard = null
+  clearGlassGlare()
+}
+
+const updateMotionPreference = () => {
+  prefersReducedMotion.value = motionPreference?.matches ?? false
+  if (prefersReducedMotion.value) resetPointerPosition()
+  updateScrollPosition()
 }
 
 const setCursorPressed = () => {
@@ -558,6 +648,7 @@ const shellStyle = computed<Record<string, string>>(() => ({
     ? 'rgba(255, 77, 24, 0.1)'
     : 'rgba(247, 247, 248, 0.02)',
   '--grid-y': `${(scrollY.value * -0.08).toFixed(1)}px`,
+  '--star-opacity': (prefersReducedMotion.value ? 0.75 : 0.75 * (1 - atmosphereProgress.value)).toFixed(3),
 }))
 
 const heroVisualStyle = computed<Record<string, string>>(() => ({
@@ -577,12 +668,17 @@ const projectRevealStyle = (index: number): Record<string, string> => ({
 })
 
 onMounted(() => {
-  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+  finePointerPreference = window.matchMedia('(hover: hover) and (pointer: fine)')
+  updateMotionPreference()
+  motionPreference.addEventListener('change', updateMotionPreference)
 
   updateAmbientBounds()
   ambientBoundsObserver = new ResizeObserver(updateAmbientBounds)
   if (spaceStage.value) ambientBoundsObserver.observe(spaceStage.value)
   if (skyStage.value) ambientBoundsObserver.observe(skyStage.value)
+  if (atmosphereStage.value) ambientBoundsObserver.observe(atmosphereStage.value)
+  if (experienceTimeline.value) ambientBoundsObserver.observe(experienceTimeline.value)
   window.addEventListener('resize', updateAmbientBounds, { passive: true })
 
   window.addEventListener('scroll', updateScrollPosition, { passive: true })
@@ -610,6 +706,13 @@ onMounted(() => {
   document.querySelectorAll('[data-reveal]').forEach((element) => {
     revealObserver?.observe(element)
   })
+
+  sceneObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => entry.target.classList.toggle('is-in-view', entry.isIntersecting))
+  }, { rootMargin: '120px', threshold: 0 })
+  document.querySelectorAll('.ambient-stage, .atmosphere-stage, .sky-stage, .landscape-hills').forEach((element) => {
+    sceneObserver?.observe(element)
+  })
 })
 
 onUnmounted(() => {
@@ -621,6 +724,9 @@ onUnmounted(() => {
   window.removeEventListener('pointerup', releaseCursorPressed)
   revealObserver?.disconnect()
   ambientBoundsObserver?.disconnect()
+  sceneObserver?.disconnect()
+  motionPreference?.removeEventListener('change', updateMotionPreference)
+  clearGlassGlare()
 
   if (scrollFrame) {
     window.cancelAnimationFrame(scrollFrame)
@@ -656,6 +762,16 @@ onUnmounted(() => {
       </span>
     </div>
 
+    <div ref="atmosphereStage" class="atmosphere-stage" :style="atmosphereStyle" aria-hidden="true">
+      <span class="atmosphere-haze"></span>
+      <span class="atmosphere-cloud atmosphere-cloud-far">
+        <img src="/images/sky/cloud.png" alt="" loading="lazy" decoding="async" draggable="false" />
+      </span>
+      <span class="atmosphere-cloud atmosphere-cloud-near">
+        <img src="/images/sky/cloud.png" alt="" loading="lazy" decoding="async" draggable="false" />
+      </span>
+    </div>
+
     <div ref="skyStage" class="sky-stage" aria-hidden="true">
       <span
         v-for="object in skyObjects"
@@ -672,18 +788,24 @@ onUnmounted(() => {
       <svg viewBox="0 0 1600 360" preserveAspectRatio="none">
         <defs>
           <g id="hill-pine">
-            <path d="M-4 -36 H4 V1 H-4 Z" fill="#574733" />
-            <path d="M0 -98 L-24 -58 H-15 L-34 -31 H-22 L-40 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#246344" />
-            <path d="M0 -98 L0 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#1c573d" />
+            <g class="tree-sway">
+              <path d="M-4 -36 H4 V1 H-4 Z" fill="#574733" />
+              <path d="M0 -98 L-24 -58 H-15 L-34 -31 H-22 L-40 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#246344" />
+              <path d="M0 -98 L0 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#1c573d" />
+            </g>
           </g>
           <g id="hill-broadleaf">
-            <path d="M-5 -44 H5 V1 H-5 Z M-2 -29 L-17 -44 L-13 -48 L3 -34 Z" fill="#675039" />
-            <ellipse cx="-19" cy="-51" rx="24" ry="24" fill="#357b4f" />
-            <ellipse cx="17" cy="-53" rx="27" ry="26" fill="#286b45" />
-            <ellipse cx="-2" cy="-72" rx="28" ry="27" fill="#3b8555" />
+            <g class="tree-sway">
+              <path d="M-5 -44 H5 V1 H-5 Z M-2 -29 L-17 -44 L-13 -48 L3 -34 Z" fill="#675039" />
+              <ellipse cx="-19" cy="-51" rx="24" ry="24" fill="#357b4f" />
+              <ellipse cx="17" cy="-53" rx="27" ry="26" fill="#286b45" />
+              <ellipse cx="-2" cy="-72" rx="28" ry="27" fill="#3b8555" />
+            </g>
           </g>
           <g id="hill-grass" fill="currentColor">
-            <path d="M-2 0 Q-9 -9 -18 -13 Q-7 -12 2 0 Z M0 0 Q-5 -14 -1 -25 Q2 -12 4 0 Z M2 0 Q8 -19 17 -22 Q11 -10 6 0 Z M-4 0 Q-15 -3 -23 -8 Q-9 -6 1 0 Z M4 0 Q16 -10 25 -9 Q13 -4 8 0 Z" />
+            <g class="grass-sway">
+              <path d="M-2 0 Q-9 -9 -18 -13 Q-7 -12 2 0 Z M0 0 Q-5 -14 -1 -25 Q2 -12 4 0 Z M2 0 Q8 -19 17 -22 Q11 -10 6 0 Z M-4 0 Q-15 -3 -23 -8 Q-9 -6 1 0 Z M4 0 Q16 -10 25 -9 Q13 -4 8 0 Z" />
+            </g>
           </g>
           <pattern id="hill-grass-texture" width="110" height="58" patternUnits="userSpaceOnUse">
             <use href="#hill-grass" transform="translate(24 36) scale(0.44)" color="#8dc07c" opacity="0.32" />
@@ -883,7 +1005,7 @@ output    : Research Projects & AI Applications</code></pre>
             identity card OCR, geospatial fire monitoring, and Indonesian-language NLP applications.
           </p>
           <ul class="achievement-list">
-            <li v-for="achievement in achievements" :key="achievement.title">
+            <li v-for="achievement in achievements" :key="achievement.title" class="glass-card">
               <span class="achievement-logo" aria-hidden="true">
                 <span>{{ achievement.initials }}</span>
                 <img :src="achievement.logo" alt="" @error="hideBrokenImage" />
@@ -910,7 +1032,7 @@ output    : Research Projects & AI Applications</code></pre>
           <article
             v-for="(group, index) in stackGroups"
             :key="group.title"
-            class="stack-card"
+            class="stack-card glass-card"
             :style="revealDelay(index)"
             data-reveal
           >
@@ -971,16 +1093,23 @@ output    : Research Projects & AI Applications</code></pre>
           </p>
         </div>
 
-        <ol class="experience-timeline" aria-label="Professional experience, earliest to most recent">
+        <ol
+          ref="experienceTimeline"
+          class="experience-timeline"
+          :style="{ '--timeline-progress': prefersReducedMotion ? '1' : timelineProgress.toFixed(4) }"
+          aria-label="Professional experience, earliest to most recent"
+        >
           <li
             v-for="(item, index) in experienceItems"
             :key="`${item.place}-${item.role}`"
             class="timeline-entry"
+            :data-reached="prefersReducedMotion || index <= activeExperience"
+            :data-current="index === activeExperience"
             :style="revealDelay(index, 50)"
             data-reveal
           >
             <span class="timeline-marker" aria-hidden="true"></span>
-            <article class="experience-item">
+            <article class="experience-item glass-card">
               <header class="experience-header">
                 <span class="experience-logo" aria-hidden="true">
                   <span>{{ item.initials }}</span>
@@ -1026,7 +1155,7 @@ output    : Research Projects & AI Applications</code></pre>
           <article
             v-for="(project, index) in projects"
             :key="project.title"
-            class="project-card"
+            class="project-card glass-card"
             :class="`project-${project.accent}`"
             :style="projectRevealStyle(index)"
             data-reveal

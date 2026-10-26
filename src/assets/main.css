@@ -31,7 +31,7 @@
     radial-gradient(1px 1px at 84% 12%, rgba(234, 245, 255, 0.7) 98%, transparent);
   background-position: center var(--grid-y, 0);
   background-size: 347px 281px, 487px 431px, 613px 557px, 797px 683px;
-  opacity: 0.75;
+  opacity: var(--star-opacity, 0.75);
   mask-image: linear-gradient(to bottom, black 75%, transparent);
 }
 
@@ -49,6 +49,27 @@
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.tree-sway,
+.grass-sway {
+  transform-origin: 0px 0px;
+}
+
+.tree-sway {
+  animation: treeSway 8s ease-in-out var(--wind-delay, -1s) infinite;
+}
+
+.grass-sway {
+  animation: grassSway 4.5s ease-in-out var(--wind-delay, -1s) infinite;
+}
+
+.landscape-hills use:nth-child(2n) {
+  --wind-delay: -2.6s;
+}
+
+.landscape-hills use:nth-child(3n) {
+  --wind-delay: -4.4s;
 }
 
 .portfolio-shell::after {
@@ -212,6 +233,58 @@
   animation: spaceFloat var(--space-duration, 14s) ease-in-out var(--space-delay, 0s) infinite;
 }
 
+.atmosphere-stage {
+  position: absolute;
+  top: 38%;
+  right: 0;
+  left: 0;
+  z-index: 0;
+  height: 25%;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, black 22%, black 84%, transparent);
+}
+
+.atmosphere-haze {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 100% 30% at 35% 44%, rgba(115, 188, 239, 0.26), transparent 76%),
+    radial-gradient(ellipse 90% 28% at 80% 76%, rgba(175, 224, 249, 0.2), transparent 74%),
+    linear-gradient(180deg, transparent, rgba(87, 166, 226, 0.09) 50%, transparent);
+  opacity: var(--haze-opacity, 0.5);
+  transform: translate3d(0, var(--atmosphere-far-y, 0px), 0);
+}
+
+.atmosphere-cloud {
+  position: absolute;
+  display: block;
+  will-change: transform;
+}
+
+.atmosphere-cloud img {
+  display: block;
+  width: 100%;
+  height: auto;
+  animation: cloudDrift 42s ease-in-out -12s infinite;
+}
+
+.atmosphere-cloud-far {
+  top: 62%;
+  left: 5%;
+  width: min(36vw, 480px);
+  opacity: calc(0.12 + var(--haze-opacity, 0.5) * 0.14);
+  transform: translate3d(var(--pointer-soft-x, 0px), var(--atmosphere-far-y, 0px), 0);
+}
+
+.atmosphere-cloud-near {
+  top: 80%;
+  right: 2%;
+  width: min(46vw, 650px);
+  opacity: calc(0.18 + var(--haze-opacity, 0.5) * 0.16);
+  transform: translate3d(var(--pointer-soft-x-inverse, 0px), var(--atmosphere-near-y, 0px), 0);
+}
+
 .sky-stage {
   position: absolute;
   top: var(--sky-zone-top);
@@ -240,7 +313,53 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  animation: skyFloat var(--sky-duration, 24s) ease-in-out var(--sky-delay, 0s) infinite;
+  animation: cloudDrift var(--sky-duration, 30s) ease-in-out var(--sky-delay, 0s) infinite;
+}
+
+.sky-balloon img {
+  animation-name: balloonFloat;
+}
+
+.sky-plane img {
+  animation-name: planeFlight;
+  animation-timing-function: linear;
+}
+
+.sky-birds img {
+  animation-name: birdsGlide;
+  animation-timing-function: linear;
+}
+
+.sky-sun img {
+  animation-name: sunPulse;
+}
+
+.ambient-stage:not(.is-in-view) .space-object img,
+.atmosphere-stage:not(.is-in-view) .atmosphere-cloud img,
+.sky-stage:not(.is-in-view) .sky-object img,
+.landscape-hills:not(.is-in-view) .tree-sway,
+.landscape-hills:not(.is-in-view) .grass-sway {
+  animation-play-state: paused;
+}
+
+.glass-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.glass-card::after {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(280px circle at var(--glare-x, 50%) var(--glare-y, 50%), rgba(234, 248, 255, 0.18), transparent 68%),
+    linear-gradient(115deg, transparent 25%, rgba(228, 245, 255, 0.035) 45%, transparent 65%);
+  border-radius: inherit;
+  opacity: var(--glare-active, 0);
+  transition: opacity 260ms ease;
+  mix-blend-mode: screen;
 }
 
 :is(.hero-lede, .spaced-copy, .body-copy > p, .section-heading > p:not(.eyebrow), .service-title small, .experience-note, .project-content p, .contact-section > p:not(.eyebrow)) {
@@ -1187,8 +1306,23 @@ summary:hover .rolling-text span {
   left: 50%;
   width: 2px;
   content: "";
-  background: linear-gradient(180deg, #ffbf92, #76bee7 55%, #ffbf92);
+  background: rgba(182, 217, 242, 0.2);
   transform: translateX(-50%);
+}
+
+.experience-timeline::after {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 50%;
+  width: 2px;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(180deg, #ffbf92, #a1d8f6 65%, #ffd09d);
+  box-shadow: 0 0 12px rgba(175, 220, 250, 0.4);
+  transform: translateX(-50%) scaleY(var(--timeline-progress, 0));
+  transform-origin: center top;
+  transition: transform 140ms linear;
 }
 
 .timeline-entry {
@@ -1227,13 +1361,32 @@ summary:hover .rolling-text span {
   z-index: 2;
   width: 14px;
   height: 14px;
-  background: #ffd09d;
+  background: #80aac5;
   border: 3px solid #285475;
   border-radius: 50%;
-  box-shadow: 0 0 0 5px rgba(255, 189, 135, 0.12), 0 0 24px rgba(255, 189, 135, 0.2);
+  box-shadow: 0 0 0 4px rgba(155, 199, 231, 0.08);
   opacity: 0;
   transform: translateX(-50%) scale(0.6);
-  transition: opacity 400ms ease, transform 500ms ease;
+  transition: opacity 400ms ease, transform 500ms ease, background 300ms ease, box-shadow 300ms ease;
+}
+
+.timeline-entry[data-reached="true"] .timeline-marker {
+  background: #ffd09d;
+  box-shadow: 0 0 0 5px rgba(255, 189, 135, 0.12), 0 0 24px rgba(255, 189, 135, 0.2);
+}
+
+.timeline-entry[data-current="true"] .timeline-marker::after {
+  position: absolute;
+  inset: -9px;
+  content: "";
+  border: 1px solid rgba(255, 209, 155, 0.6);
+  border-radius: 50%;
+  animation: timelineBeacon 1200ms ease-out both;
+}
+
+.timeline-entry[data-current="true"] .experience-item {
+  border-color: rgba(255, 209, 155, 0.42);
+  box-shadow: 0 18px 42px rgba(5, 30, 54, 0.16), 0 0 28px rgba(255, 199, 139, 0.07);
 }
 
 .timeline-entry[data-reveal] {
@@ -1859,14 +2012,114 @@ summary:hover .rolling-text span {
   }
 }
 
-@keyframes skyFloat {
+@keyframes cloudDrift {
   0%,
   100% {
-    transform: translate3d(-5px, 3px, 0) rotate(-1deg);
+    transform: translate3d(calc(var(--sky-drift, 26px) * -1), 3px, 0) rotate(-0.6deg);
   }
 
   50% {
-    transform: translate3d(5px, -7px, 0) rotate(1deg);
+    transform: translate3d(var(--sky-drift, 26px), -8px, 0) rotate(0.6deg);
+  }
+}
+
+@keyframes balloonFloat {
+  0%,
+  100% {
+    transform: translate3d(3px, 5px, 0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translate3d(-3px, -16px, 0) rotate(1.5deg);
+  }
+}
+
+@keyframes planeFlight {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) rotate(1deg);
+  }
+
+  8%,
+  92% {
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate3d(calc(var(--sky-flight-distance, 0px) * 0.5), -12px, 0) rotate(-1deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--sky-flight-distance, 0px), -16px, 0) rotate(1deg);
+  }
+}
+
+@keyframes birdsGlide {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+
+  12%,
+  88% {
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate3d(calc(var(--sky-flight-distance, 0px) * 0.5), -10px, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--sky-flight-distance, 0px), 4px, 0);
+  }
+}
+
+@keyframes sunPulse {
+  0%,
+  100% {
+    opacity: 0.78;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes treeSway {
+  0%,
+  100% {
+    transform: rotate(0.3deg);
+  }
+
+  50% {
+    transform: rotate(1.8deg);
+  }
+}
+
+@keyframes grassSway {
+  0%,
+  100% {
+    transform: skewX(-2deg);
+  }
+
+  50% {
+    transform: skewX(-12deg);
+  }
+}
+
+@keyframes timelineBeacon {
+  from {
+    opacity: 0.75;
+    transform: scale(0.7);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.8);
   }
 }
 
@@ -1922,7 +2175,8 @@ summary:hover .rolling-text span {
 }
 
 @media (hover: none), (pointer: coarse) {
-  .pointer-cursor {
+  .pointer-cursor,
+  .glass-card::after {
     display: none;
   }
 }
@@ -2020,7 +2274,8 @@ summary:hover .rolling-text span {
     padding: 72px 0;
   }
 
-  .experience-timeline::before {
+  .experience-timeline::before,
+  .experience-timeline::after {
     left: 10px;
   }
 
@@ -2160,8 +2415,26 @@ summary:hover .rolling-text span {
   }
 
   .space-object img,
-  .sky-object img {
+  .sky-object img,
+  .atmosphere-cloud img,
+  .tree-sway,
+  .grass-sway,
+  .timeline-entry[data-current="true"] .timeline-marker::after {
     animation: none !important;
+  }
+
+  .atmosphere-cloud,
+  .atmosphere-haze {
+    transform: none !important;
+  }
+
+  .glass-card::after {
+    display: none;
+  }
+
+  .experience-timeline::after {
+    transform: translateX(-50%) scaleY(1);
+    transition: none;
   }
 
   .timeline-entry .experience-item {
