@@ -19,6 +19,7 @@ type Achievement = {
 }
 
 type Experience = {
+  start: string
   period: string
   role: string
   place: string
@@ -31,7 +32,7 @@ type Experience = {
 type Service = {
   title: string
   description: string
-  details: string
+  areas: string[]
 }
 
 type ContactLink = {
@@ -41,121 +42,175 @@ type ContactLink = {
   paths: string[]
 }
 
-const navItems = ['Home', 'About', 'Stack', 'Services', 'Experience', 'Projects', 'Contact']
+type SpaceObject = {
+  id: string
+  image: string
+  x: number
+  y: number
+  size: number
+  rotation: number
+  depth: number
+  speed: number
+  opacity: number
+  duration: number
+}
+
+type SkyObject = SpaceObject & {
+  aspectRatio: number
+  mobileX: number
+}
+
+const spaceObjects: SpaceObject[] = [
+  { id: 'planet', image: '/images/space/planet.png', x: 0.07, y: 0.045, size: 190, rotation: -8, depth: 14, speed: -0.045, opacity: 0.72, duration: 12 },
+  { id: 'moon', image: '/images/space/moon.png', x: 0.93, y: 0.3, size: 122, rotation: 12, depth: -11, speed: 0.03, opacity: 0.7, duration: 15 },
+  { id: 'asteroid', image: '/images/space/asteroid.png', x: 0.06, y: 0.52, size: 104, rotation: -16, depth: 10, speed: -0.035, opacity: 0.7, duration: 11 },
+  { id: 'satellite', image: '/images/space/satellite.png', x: 0.93, y: 0.7, size: 162, rotation: 10, depth: -14, speed: 0.04, opacity: 0.72, duration: 14 },
+  { id: 'comet', image: '/images/space/comet.png', x: 0.82, y: 0.03, size: 138, rotation: 10, depth: -10, speed: -0.025, opacity: 0.58, duration: 16 },
+  { id: 'nebula', image: '/images/space/nebula.png', x: 0.22, y: 0.86, size: 240, rotation: -4, depth: 8, speed: 0.025, opacity: 0.3, duration: 20 },
+]
+
+const skyObjects: SkyObject[] = [
+  { id: 'cloud', image: '/images/sky/cloud.png', x: 0.1, mobileX: 0.2, y: 0.1, size: 420, aspectRatio: 2, rotation: -2, depth: 8, speed: 0.018, opacity: 0.42, duration: 24 },
+  { id: 'balloon', image: '/images/sky/balloon.png', x: 0.93, mobileX: 0.84, y: 0.32, size: 155, aspectRatio: 2 / 3, rotation: 3, depth: -10, speed: -0.022, opacity: 0.72, duration: 18 },
+  { id: 'plane', image: '/images/sky/plane.png', x: 0.07, mobileX: 0.18, y: 0.51, size: 245, aspectRatio: 1.5, rotation: -5, depth: 9, speed: 0.025, opacity: 0.6, duration: 22 },
+  { id: 'birds', image: '/images/sky/birds.png', x: 0.83, mobileX: 0.74, y: 0.71, size: 330, aspectRatio: 2, rotation: -3, depth: -7, speed: -0.018, opacity: 0.62, duration: 26 },
+  { id: 'sun', image: '/images/sky/sun.png', x: 0.88, mobileX: 0.83, y: 0.91, size: 330, aspectRatio: 1.5, rotation: 0, depth: -4, speed: 0.01, opacity: 0.5, duration: 30 },
+]
+
+const navItems = ['Home', 'About', 'Stack', 'Expertise', 'Experience', 'Projects', 'Contact']
 const sectionIds = navItems.map((item) => item.toLowerCase())
 
 const focusAreas = [
-  'RAG Systems',
+  'Machine Learning',
   'Computer Vision',
-  'NLP & LLM',
-  'Time Series',
-  'Applied AI',
-  'Python Engineering',
+  'Natural Language Processing',
+  'Time-Series Forecasting',
+  'LLM & RAG',
+  'MLOps',
 ]
 
 const stats = [
-  { value: '6', label: 'Highlighted AI projects' },
-  { value: '3.73', label: 'Current GPA' },
-  { value: '4', label: 'Core AI domains' },
-  { value: 'IS Lab', label: 'Research home' },
+  { value: '17+', label: 'AI projects done' },
+  { value: '6+', label: 'Competitions awards' },
+  { value: '4+', label: 'Research' },
 ]
 
 const stackGroups = [
   {
-    title: 'Machine Learning',
-    items: ['Pandas', 'NumPy', 'Scikit-learn', 'SHAP', 'Captum', 'Model Evaluation'],
+    title: 'Data & Machine Learning',
+    items: ['Pandas', 'NumPy', 'Scikit-learn', 'LightGBM', 'CatBoost', 'SHAP'],
   },
   {
-    title: 'Deep Learning & CV',
-    items: ['PyTorch', 'TensorFlow', 'Hugging Face', 'OpenCV', 'MONAI', 'Ultralytics'],
+    title: 'Deep Learning & vision',
+    items: ['PyTorch', 'TensorFlow', 'OpenCV', 'MONAI', 'Ultralytics', 'Mediapipe'],
   },
   {
-    title: 'NLP & LLM',
-    items: ['RAG', 'FAISS', 'BGE-M3', 'BM25', 'PostgreSQL', 'Gemini/OpenAI'],
+    title: 'NLP & Retrieval',
+    items: ['RAG', 'BGE-M3', 'BM25', 'RRF', 'FAISS', 'Qwen3-VL'],
   },
   {
-    title: 'Backend & Delivery',
-    items: ['FastAPI', 'Flask', 'Streamlit', 'Azure Functions', 'Docker', 'Git'],
+    title: 'Backend & Deployment',
+    items: ['FastAPI', 'Flask', 'React', 'TypeScript', 'Hugging Face', 'Azure Functions', 'Docker', 'Git', 'PostgreSQL'],
   },
 ]
 
 const services: Service[] = [
   {
-    title: 'Machine Learning Systems',
-    description: 'Predictive modeling, experiment tracking, explainability, and clean evaluation reports.',
-    details:
-      'Built around practical workflows: preprocessing, baseline models, feature engineering, SHAP/Captum interpretation, and decision-ready reporting.',
+    title: 'Machine Learning & Evaluation',
+    description:
+      'Developing predictive models, comparing different approaches, and evaluating their performance.',
+    areas: [
+      'Data Preprocessing',
+      'Feature Engineering',
+      'Model Training & Comparison',
+      'Performance Evaluation',
+    ],
   },
   {
     title: 'RAG & NLP Applications',
-    description: 'Document-grounded assistants for Indonesian text, source retrieval, and answer generation.',
-    details:
-      'Combines chunking, hybrid retrieval, reranking, vector memory, prompt orchestration, and API-first prototypes with clear source traces.',
+    description:
+      'Developing applications that combine information retrieval with natural language processing and language models.',
+    areas: [
+      'Document Processing & Chunking',
+      'Information Retrieval',
+      'LLM Integration',
+      'Retrieval & Response Evaluation',
+    ],
   },
   {
-    title: 'Computer Vision Prototypes',
-    description: 'Classification and segmentation workflows for security, medical imaging, and video analytics.',
-    details:
-      'Experience includes anti-spoofing, MRI segmentation, drowsiness detection, OpenCV pipelines, and deep learning model comparison.',
+    title: 'Computer Vision & Image Analysis',
+    description:
+      'Developing deep learning models for image classification, object detection, and segmentation.',
+    areas: [
+      'Image Preprocessing',
+      'Classification & Object Detection',
+      'Image Segmentation',
+      'Model Evaluation',
+    ],
   },
   {
-    title: 'Data Apps & Dashboards',
-    description: 'Readable interfaces that turn model outputs into tools people can actually inspect and use.',
-    details:
-      'From Streamlit demos to FastAPI backends, with visualization, API testing, documentation, and lightweight deployment in mind.',
+    title: 'Data Applications & APIs',
+    description:
+      'Developing APIs and interactive applications to integrate machine learning models and present their results.',
+    areas: [
+      'Backend API Development',
+      'Data Visualization',
+      'Model Integration',
+      'Testing & Documentation',
+    ],
   },
 ]
 
 const projects: Project[] = [
   {
-    title: 'DSN-MUI UMKM RAG',
-    description:
-      'A modular RAG prototype for Indonesian Islamic finance guidance with BGE-M3 embeddings, BM25, RRF fusion, reranking, Qwen3-VL visual reasoning, and FastAPI delivery.',
-    stack: ['RAG', 'BGE-M3', 'BM25', 'FastAPI'],
-    link: 'https://github.com/Ditt-A/DSNMUI_RAG',
-    accent: 'rag',
-    image: '/images/projects/amana.png',
-  },
-  {
     title: 'Brain Tumour Segmentation',
     description:
-      'MRI brain tumor segmentation research using U-Net and U-Net++ pipelines, comparative training reports, checkpoints, and prediction notebooks.',
+      '3D multimodal MRI segmentation with U-Net, U-Net++, and MedicalNet ResNet18, plus experiment reports and an interactive MRI/reference viewer.',
     stack: ['Medical Imaging', 'Segmentation', 'PyTorch'],
     link: 'https://github.com/Ditt-A/BrainTumourSegmentation',
     accent: 'vision',
     image: '/images/projects/brain.png',
   },
   {
+    title: 'AMANA / DSN-MUI UMKM RAG',
+    description:
+      'Document-grounded DSN-MUI assistant with BGE-M3, BM25, RRF, reranking, optional Qwen3-VL visual reasoning, and a React/FastAPI prototype.',
+    stack: ['RAG', 'Hybrid Retrieval', 'Qwen3-VL'],
+    link: 'https://github.com/Ditt-A/DSNMUI_RAG',
+    accent: 'rag',
+    image: '/images/projects/amana.png',
+  },
+  {
     title: 'Face Spoofing Detection',
     description:
-      'Real/spoof face classification for biometric security across printed, screen, mask, mannequin, unknown spoof, and genuine classes.',
+      'Six-class face presentation-attack research using DINOv3, ConvNeXt, and FSFM, with an interactive dataset gallery and FastAPI reference demo.',
     stack: ['Computer Vision', 'Anti-Spoofing', 'Ensemble'],
     link: 'https://github.com/Ditt-A/Face-Spoofing-Detection',
     accent: 'security',
     image: '/images/projects/spoofing.png',
   },
   {
-    title: 'AirSafe School',
+    title: 'Robust Identity Card OCR',
     description:
-      'Air quality prediction and school recommendation system for DKI Jakarta using PM2.5 data, weather features, Kriging, SHAP, and Azure Functions.',
-    stack: ['Time Series', 'LightGBM', 'SHAP'],
-    link: 'https://github.com/RedEye1605/airsafe-school',
-    accent: 'forecast',
-    image: '/images/projects/airsafe.jpeg',
-  },
-  {
-    title: 'Leksara',
-    description:
-      'Open-source Indonesian text preprocessing library for noisy review content, slang normalization, PII masking, stopwords, and reusable NLP cleaning workflows.',
-    stack: ['Python Package', 'Indonesian NLP', 'Preprocessing'],
-    link: 'https://github.com/RedEye1605/Leksara',
+      'A team project for extracting names, birth dates, and addresses from varied identity documents using PP-OCRv6 and OpenOCR, with retained benchmark reports.',
+    stack: ['OCR', 'Document Understanding', 'Computer Vision'],
+    link: 'https://github.com/Ditt-A/RobustIdentityCardOCR',
     accent: 'nlp',
-    image: '/images/projects/Leksara.jpeg',
+    image: '/images/projects/ocr.png',
   },
   {
-    title: 'AI-MoodBand',
+    title: 'Kalimantan FireWatch',
     description:
-      'Local AI reflection app with Gemini, FAISS memory retrieval, daily summaries, optional image context, and safety-aware coaching responses.',
+      'Decision-support dashboard for Kalimantan fire monitoring, combining satellite detections, geospatial context, incident prioritization, and response-planning support.',
+    stack: ['Geospatial Data', 'FastAPI', 'Next.js'],
+    link: 'https://github.com/Ditt-A/Kalimantan-FireWatch',
+    accent: 'forecast',
+    image: '/images/projects/firewatch.png',
+  },
+  {
+    title: 'Senandika / AI-MoodBand',
+    description:
+      'Non-clinical Indonesian reflection app with Gemini, FAISS conversational memory, mood check-ins, daily summaries, and safety-aware response flows.',
     stack: ['Flask', 'Gemini', 'FAISS'],
     link: 'https://github.com/Ditt-A/AI-MoodBand',
     accent: 'memory',
@@ -165,56 +220,91 @@ const projects: Project[] = [
 
 const achievements: Achievement[] = [
   {
-    title: 'Finalist, Data Analytics Competition Find IT! 2026',
-    organizer: 'Universitas Gadjah Mada',
+    title: '1st Winner — Data Science, Sebelas Maret Statistics Fair 2026',
+    organizer: 'Universitas Sebelas Maret · Sep 2026',
+    logo: '/images/logos/uns.png',
+    initials: 'UNS',
+  },
+  {
+    title: 'Top 8 Semifinalist — Datathon RISTEK UI 2026',
+    organizer: 'Universitas Indonesia · Aug 2026',
+    logo: '/images/logos/ui.png',
+    initials: 'UI',
+  },
+  {
+    title: '1st Honorable Mention — International Data Science FIT Competition 2026',
+    organizer: 'Universitas Kristen Satya Wacana · Jul 2026',
+    logo: '/images/logos/uksw.png',
+    initials: 'UKSW',
+  },
+  {
+    title: 'Finalist — Data Analytics Competition, FIND IT! 2026',
+    organizer: 'Universitas Gadjah Mada · May 2026',
     logo: '/images/logos/ugm.jpg',
     initials: 'UGM',
   },
   {
-    title: 'Top 7 Finalist, Datavidia Arkavidia 10.0',
-    organizer: 'Institut Teknologi Bandung',
+    title: 'Top 7 Finalist — Datavidia Arkavidia 10.0',
+    organizer: 'Institut Teknologi Bandung · Mar 2026',
     logo: '/images/logos/itb.png',
     initials: 'ITB',
   },
-  {
-    title: '12th Place, Machine Learning Competition Data Slayer 3.0',
-    organizer: 'Telkom University',
-    logo: '/images/logos/telkom-university.png',
-    initials: 'T.U',
-  },
 ]
 
-const curationTags = ['Source-Grounded', 'Inspectable', 'Pythonic', 'Research-Ready']
+const curationTags = ['Model Development', 'Experimentation', 'Model Evaluation', 'Prototyping']
 
 const experienceItems: Experience[] = [
   {
-    period: '2025 - Ongoing',
-    role: 'Research Member & Research Intern',
-    place: 'Intelligent Systems Laboratory, FILKOM UB',
-    note: 'Applied AI research, experiment design, model evaluation, and technical documentation.',
-    logo: '/images/logos/is-lab.jpg',
-    initials: 'IS',
-    linkedin: 'https://www.linkedin.com/company/labsc-ub/',
-  },
-  {
-    period: '2025 - Ongoing',
-    role: 'Vice Head of Talent Development',
+    start: '2025-02',
+    period: 'Feb 2025 – Present',
+    role: 'Data Scientist & Vice Head of Talent Development',
     place: 'BCC FILKOM Universitas Brawijaya',
-    note: 'Learning roadmaps, upskilling programs, and talent growth inside a student technology community.',
+    note: 'Progressed from Data Science Intern to Data Scientist while leading talent development, the 2025 Data Science Mini Bootcamp for 120 participants, and BCC Open Recruitment 2026.',
     logo: '/images/logos/bcc.jpg',
     initials: 'BCC',
     linkedin: 'https://www.linkedin.com/company/bccfilkomub/posts/?feedView=all',
   },
   {
-    period: '2025 - Ongoing',
+    start: '2025-09',
+    period: 'Sep 2025 – Present',
+    role: 'AI Researcher',
+    place: 'Intelligent Systems Laboratory, FILKOM UB',
+    note: 'Progressed from Research Intern to AI Researcher, conducting deep-learning experiments, model evaluation, and scientific reporting in computer vision, medical imaging, and NLP.',
+    logo: '/images/logos/is-lab.jpg',
+    initials: 'IS',
+    linkedin: 'https://www.linkedin.com/company/labsc-ub/',
+  },
+  {
+    start: '2025-10',
+    period: 'Oct 2025 – Aug 2026',
     role: 'Machine Learning Mentor',
     place: 'Google Developer Groups on Campus (GDGoC)',
-    note: 'Mentoring machine learning fundamentals, guiding hands-on projects, and supporting members through model development and evaluation.',
+    note: 'Mentored 240 participants through Machine Learning Study Jams covering preprocessing, visualization, machine-learning workflows, deep learning, and introductory computer vision.',
     logo: '/images/logos/gdgoc.jpg',
     initials: 'GDG',
     linkedin: 'https://www.linkedin.com/company/gdgcub/',
   },
-]
+  {
+    start: '2026-09',
+    period: 'Sep – Nov 2026',
+    role: 'AI Engineer Intern',
+    place: 'PT Pertamina Patra Niaga',
+    note: 'Contributing to AI engineering work involving large language models, retrieval-augmented generation, automation, and GraphQL-based workflows.',
+    logo: '/images/logos/pertamina-patra-niaga.svg',
+    initials: 'PPN',
+    linkedin: 'https://www.linkedin.com/company/ptpertaminapatraniaga/',
+  },
+  {
+    start: '2026-09',
+    period: 'Sep – Nov 2026',
+    role: 'AI Engineer Intern',
+    place: 'AI Talent Factory (AITF), Komdigi',
+    note: 'Fine-tuned expressive Indonesian TTS models for four voices; developing integration with animated 2D virtual teacher avatars for educational content.',
+    logo: '/images/logos/komdigi.svg',
+    initials: 'AITF',
+    linkedin: 'https://www.linkedin.com/company/ministry-of-communication-and-information-technology-of-the-republic-of-indonesia/?originalSubdomain=id',
+  },
+].sort((a, b) => a.start.localeCompare(b.start))
 
 const hideBrokenImage = (event: Event) => {
   const image = event.currentTarget
@@ -259,13 +349,103 @@ const cursorVisible = ref(false)
 const cursorInteractive = ref(false)
 const cursorPressed = ref(false)
 const prefersReducedMotion = ref(false)
+const spaceStage = ref<HTMLElement | null>(null)
+const spaceBounds = ref({ width: 0, height: 0, viewportHeight: 0 })
+const skyStage = ref<HTMLElement | null>(null)
+const skyBounds = ref({ width: 0, height: 0, top: 0, viewportHeight: 0 })
 
 let scrollFrame = 0
 let pointerFrame = 0
 let revealObserver: IntersectionObserver | undefined
+let ambientBoundsObserver: ResizeObserver | undefined
 let latestPointer = { x: 0, y: 0, clientX: 0, clientY: 0 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+
+const updateAmbientBounds = () => {
+  if (spaceStage.value) {
+    spaceBounds.value = {
+      width: spaceStage.value.clientWidth,
+      height: spaceStage.value.clientHeight,
+      viewportHeight: window.innerHeight,
+    }
+  }
+
+  if (skyStage.value) {
+    skyBounds.value = {
+      width: skyStage.value.clientWidth,
+      height: skyStage.value.clientHeight,
+      top: skyStage.value.getBoundingClientRect().top + window.scrollY,
+      viewportHeight: window.innerHeight,
+    }
+  }
+}
+
+const spaceObjectStyle = (object: SpaceObject): Record<string, string> => {
+  const { width, height, viewportHeight } = spaceBounds.value
+  if (!width || !height) return { opacity: '0' }
+
+  const compact = width <= 820
+  const size = object.size * clamp(width / 1440, compact ? 0.46 : 0.6, 1)
+  const angle = ((Math.abs(object.rotation) + 3) * Math.PI) / 180
+  // Reserve room for the rotated corners and the child's gentle floating animation.
+  const inset = 16 + (size * (Math.cos(angle) + Math.sin(angle) - 1)) / 2 + 12
+  const baseX = width * object.x - size / 2
+  const isHeroObject = object.id === 'planet' || object.id === 'comet'
+  const baseY = compact && isHeroObject
+    ? viewportHeight * 0.105 - size / 2
+    : height * object.y - size / 2
+  const localScroll = scrollY.value - Math.max(0, baseY - viewportHeight / 2)
+  const scrollShift = prefersReducedMotion.value ? 0 : clamp(localScroll * object.speed, -36, 36)
+  const pointerShiftX = prefersReducedMotion.value ? 0 : pointerX.value * object.depth
+  const pointerShiftY = prefersReducedMotion.value ? 0 : pointerY.value * object.depth * 0.7
+  const x = clamp(baseX + pointerShiftX, inset, Math.max(inset, width - size - inset))
+  const y = clamp(baseY + pointerShiftY + scrollShift, inset, Math.max(inset, height - size - inset))
+
+  return {
+    width: `${size.toFixed(1)}px`,
+    height: `${size.toFixed(1)}px`,
+    '--space-x': `${x.toFixed(1)}px`,
+    '--space-y': `${y.toFixed(1)}px`,
+    '--space-rotation': `${object.rotation}deg`,
+    '--space-opacity': String(object.opacity),
+    '--space-duration': `${object.duration}s`,
+    '--space-delay': `${-object.duration * 0.35}s`,
+  }
+}
+
+const skyObjectStyle = (object: SkyObject): Record<string, string> => {
+  const { width, height, top, viewportHeight } = skyBounds.value
+  if (!width || !height) return { opacity: '0' }
+
+  const compact = width <= 820
+  const objectWidth = object.size * clamp(width / 1440, compact ? 0.46 : 0.6, 1)
+  const objectHeight = objectWidth / object.aspectRatio
+  const angle = ((Math.abs(object.rotation) + 2) * Math.PI) / 180
+  // Include the rotated corners and floating motion when keeping assets inside the sky.
+  const insetX = 24 + Math.max(0, (objectWidth * Math.cos(angle) + objectHeight * Math.sin(angle) - objectWidth) / 2)
+  const insetY = 24 + Math.max(0, (objectHeight * Math.cos(angle) + objectWidth * Math.sin(angle) - objectHeight) / 2)
+  const baseX = width * (compact ? object.mobileX : object.x) - objectWidth / 2
+  const baseY = height * object.y - objectHeight / 2
+  const localScroll = scrollY.value - Math.max(0, top + baseY - viewportHeight / 2)
+  const scrollShift = prefersReducedMotion.value ? 0 : clamp(localScroll * object.speed, -24, 24)
+  const pointerShiftX = prefersReducedMotion.value ? 0 : pointerX.value * object.depth
+  const pointerShiftY = prefersReducedMotion.value ? 0 : pointerY.value * object.depth * 0.6
+  const x = clamp(baseX + pointerShiftX, insetX, Math.max(insetX, width - objectWidth - insetX))
+  const y = clamp(baseY + pointerShiftY + scrollShift, insetY, Math.max(insetY, height - objectHeight - insetY))
+
+  return {
+    width: `${objectWidth.toFixed(1)}px`,
+    height: `${objectHeight.toFixed(1)}px`,
+    '--sky-x': `${x.toFixed(1)}px`,
+    '--sky-y': `${y.toFixed(1)}px`,
+    '--sky-rotation': `${object.rotation}deg`,
+    '--sky-opacity': String(object.opacity),
+    '--sky-duration': `${object.duration}s`,
+    '--sky-delay': `${-object.duration * 0.35}s`,
+  }
+}
+
 const interactiveSelector = [
   'a',
   'button',
@@ -389,15 +569,21 @@ const heroVisualStyle = computed<Record<string, string>>(() => ({
 const projectRevealStyle = (index: number): Record<string, string> => ({
   ...revealDelay(index, 85),
   '--card-depth': `${index % 2 === 0 ? 1 : -1}`,
-  '--project-shift-x': `${(pointerX.value * (index % 2 === 0 ? 16 : -16)).toFixed(1)}px`,
-  '--project-shift-y': `${(pointerY.value * (index % 2 === 0 ? -10 : 10)).toFixed(1)}px`,
-  '--preview-shift-x': `${(pointerX.value * (index % 2 === 0 ? -22 : 22)).toFixed(1)}px`,
-  '--preview-shift-y': `${(pointerY.value * (index % 2 === 0 ? 14 : -14)).toFixed(1)}px`,
+  '--project-shift-x': `${(pointerX.value * (index % 2 === 0 ? 8 : -8)).toFixed(1)}px`,
+  '--project-shift-y': `${(pointerY.value * (index % 2 === 0 ? -6 : 6)).toFixed(1)}px`,
+  '--preview-shift-x': `${(pointerX.value * (index % 2 === 0 ? -12 : 12)).toFixed(1)}px`,
+  '--preview-shift-y': `${(pointerY.value * (index % 2 === 0 ? 8 : -8)).toFixed(1)}px`,
   '--project-tilt-y': `${(index % 2 === 0 ? -2 : 2).toFixed(1)}deg`,
 })
 
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  updateAmbientBounds()
+  ambientBoundsObserver = new ResizeObserver(updateAmbientBounds)
+  if (spaceStage.value) ambientBoundsObserver.observe(spaceStage.value)
+  if (skyStage.value) ambientBoundsObserver.observe(skyStage.value)
+  window.addEventListener('resize', updateAmbientBounds, { passive: true })
 
   window.addEventListener('scroll', updateScrollPosition, { passive: true })
   window.addEventListener('pointermove', updatePointerPosition, { passive: true })
@@ -427,12 +613,14 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', updateAmbientBounds)
   window.removeEventListener('scroll', updateScrollPosition)
   window.removeEventListener('pointermove', updatePointerPosition)
   window.removeEventListener('pointerleave', resetPointerPosition)
   window.removeEventListener('pointerdown', setCursorPressed)
   window.removeEventListener('pointerup', releaseCursorPressed)
   revealObserver?.disconnect()
+  ambientBoundsObserver?.disconnect()
 
   if (scrollFrame) {
     window.cancelAnimationFrame(scrollFrame)
@@ -456,11 +644,107 @@ onUnmounted(() => {
       <span class="cursor-label">open</span>
     </div>
 
-    <div class="ambient-stage" aria-hidden="true">
-      <span class="parallax-shape shape-prism" :style="parallaxStyle(-0.08, 90)"></span>
-      <span class="parallax-shape shape-cylinder" :style="parallaxStyle(0.06, 120)"></span>
-      <span class="parallax-shape shape-tile" :style="parallaxStyle(-0.045, 90)"></span>
-      <span class="parallax-shape shape-code" :style="parallaxStyle(0.035, 110)"></span>
+    <div ref="spaceStage" class="ambient-stage" aria-hidden="true">
+      <span
+        v-for="object in spaceObjects"
+        :key="object.id"
+        class="space-object"
+        :class="`space-${object.id}`"
+        :style="spaceObjectStyle(object)"
+      >
+        <img :src="object.image" alt="" decoding="async" draggable="false" />
+      </span>
+    </div>
+
+    <div ref="skyStage" class="sky-stage" aria-hidden="true">
+      <span
+        v-for="object in skyObjects"
+        :key="object.id"
+        class="sky-object"
+        :class="`sky-${object.id}`"
+        :style="skyObjectStyle(object)"
+      >
+        <img :src="object.image" alt="" loading="lazy" decoding="async" draggable="false" />
+      </span>
+    </div>
+
+    <div class="landscape-hills" aria-hidden="true">
+      <svg viewBox="0 0 1600 360" preserveAspectRatio="none">
+        <defs>
+          <g id="hill-pine">
+            <path d="M-4 -36 H4 V1 H-4 Z" fill="#574733" />
+            <path d="M0 -98 L-24 -58 H-15 L-34 -31 H-22 L-40 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#246344" />
+            <path d="M0 -98 L0 -8 H40 L22 -31 H34 L15 -58 H24 Z" fill="#1c573d" />
+          </g>
+          <g id="hill-broadleaf">
+            <path d="M-5 -44 H5 V1 H-5 Z M-2 -29 L-17 -44 L-13 -48 L3 -34 Z" fill="#675039" />
+            <ellipse cx="-19" cy="-51" rx="24" ry="24" fill="#357b4f" />
+            <ellipse cx="17" cy="-53" rx="27" ry="26" fill="#286b45" />
+            <ellipse cx="-2" cy="-72" rx="28" ry="27" fill="#3b8555" />
+          </g>
+          <g id="hill-grass" fill="currentColor">
+            <path d="M-2 0 Q-9 -9 -18 -13 Q-7 -12 2 0 Z M0 0 Q-5 -14 -1 -25 Q2 -12 4 0 Z M2 0 Q8 -19 17 -22 Q11 -10 6 0 Z M-4 0 Q-15 -3 -23 -8 Q-9 -6 1 0 Z M4 0 Q16 -10 25 -9 Q13 -4 8 0 Z" />
+          </g>
+          <pattern id="hill-grass-texture" width="110" height="58" patternUnits="userSpaceOnUse">
+            <use href="#hill-grass" transform="translate(24 36) scale(0.44)" color="#8dc07c" opacity="0.32" />
+            <use href="#hill-grass" transform="translate(87 57) scale(0.3)" color="#b0cd8c" opacity="0.24" />
+          </pattern>
+          <linearGradient id="hill-distant" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#7ebd8c" />
+            <stop offset="100%" stop-color="#4d946e" />
+          </linearGradient>
+          <linearGradient id="hill-near" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#358a58" />
+            <stop offset="100%" stop-color="#18513e" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M0 150 C180 45 320 55 510 154 C680 242 820 72 1010 104 C1230 139 1360 42 1600 138 L1600 360 L0 360 Z"
+          fill="url(#hill-distant)"
+        />
+        <g opacity="0.8">
+          <use href="#hill-pine" transform="translate(145 105) scale(0.55)" />
+          <use href="#hill-pine" transform="translate(182 102) scale(0.4)" />
+          <use href="#hill-broadleaf" transform="translate(1335 112) scale(0.58)" />
+        </g>
+        <path
+          d="M0 230 C210 134 356 147 562 236 C780 329 966 139 1190 174 C1370 202 1470 236 1600 184 L1600 360 L0 360 Z"
+          fill="#43976a"
+        />
+        <use href="#hill-broadleaf" transform="translate(320 185) scale(0.78)" />
+        <use href="#hill-pine" transform="translate(1120 193) scale(0.8)" />
+        <use href="#hill-pine" transform="translate(1165 193) scale(0.6)" />
+        <g color="#85bd7c" opacity="0.72">
+          <use href="#hill-grass" transform="translate(225 202) scale(0.55)" />
+          <use href="#hill-grass" transform="translate(455 236) scale(0.48)" />
+          <use href="#hill-grass" transform="translate(690 279) scale(0.64)" />
+          <use href="#hill-grass" transform="translate(880 235) scale(0.5)" />
+          <use href="#hill-grass" transform="translate(1050 205) scale(0.56)" />
+          <use href="#hill-grass" transform="translate(1260 221) scale(0.46)" />
+          <use href="#hill-grass" transform="translate(1530 228) scale(0.62)" />
+        </g>
+        <path
+          d="M0 280 C220 333 370 214 610 262 C840 308 1010 233 1220 261 C1380 282 1480 302 1600 260 L1600 360 L0 360 Z"
+          fill="url(#hill-near)"
+        />
+        <path
+          d="M0 280 C220 333 370 214 610 262 C840 308 1010 233 1220 261 C1380 282 1480 302 1600 260 L1600 360 L0 360 Z"
+          fill="url(#hill-grass-texture)"
+        />
+        <g color="#92bf78" opacity="0.8">
+          <use href="#hill-grass" transform="translate(190 318) scale(0.95)" />
+          <use href="#hill-grass" transform="translate(400 291) scale(0.75)" />
+          <use href="#hill-grass" transform="translate(590 294) scale(1.05)" />
+          <use href="#hill-grass" transform="translate(820 318) scale(0.8)" />
+          <use href="#hill-grass" transform="translate(1000 293) scale(0.9)" />
+          <use href="#hill-grass" transform="translate(1230 316) scale(0.72)" />
+          <use href="#hill-grass" transform="translate(1360 332) scale(1.1)" />
+          <use href="#hill-grass" transform="translate(1550 305) scale(0.85)" />
+        </g>
+        <use href="#hill-broadleaf" transform="translate(90 292) scale(1.05)" />
+        <use href="#hill-pine" transform="translate(1420 291) scale(0.78)" />
+        <use href="#hill-pine" transform="translate(1485 286) scale(1.08)" />
+      </svg>
     </div>
 
     <nav class="site-nav" aria-label="Primary navigation">
@@ -483,11 +767,11 @@ onUnmounted(() => {
     <main>
       <section id="home" class="hero-section section">
         <div class="hero-copy">
-          <p class="eyebrow">Applied AI Systems / Malang, Indonesia</p>
+          <p class="eyebrow">AI ENGINEERING & RESEARCH / MALANG, INDONESIA</p>
           <h1>Hi, I'm <span>Aditya Akbar</span></h1>
           <p class="hero-lede">
-            Computer Science undergraduate at Universitas Brawijaya building source-grounded
-            AI workflows across RAG, computer vision, NLP, and time-series forecasting.
+            I'm a Computer Science student at Universitas Brawijaya, with experience in AI engineering and machine learning research.
+             I work on various projects involving computer vision, NLP, retrieval-augmented generation, and time-series forecasting.
           </p>
 
           <div class="focus-pills" aria-label="Focus areas">
@@ -514,7 +798,7 @@ onUnmounted(() => {
           <img :src="profilePhoto" alt="Aditya Akbar" />
           <div class="availability-panel">
             <span class="status-dot"></span>
-            <p>Research Member & Research Intern at Intelligent Systems Laboratory, FILKOM UB</p>
+            <p>AI Researcher at Intelligent Systems Laboratory, FILKOM UBB</p>
           </div>
         </div>
       </section>
@@ -534,31 +818,31 @@ onUnmounted(() => {
 
       <section class="section editorial-band" data-reveal>
         <div class="editorial-meta">
-          <span>Personal Profile / Applied AI</span>
+          <span>ABOUT / BACKGROUND</span>
           <span>(Aditya - 01)</span>
-          <span>Applied AI Builder</span>
+          <span>AI ENGINEERING & RESEARCH</span>
         </div>
 
         <div class="marquee" aria-hidden="true">
           <div class="marquee-track">
-            <span>Source-grounded AI</span>
             <span>Computer Vision</span>
-            <span>Indonesian NLP</span>
+            <span>Natural Language Processing</span>
+            <span>RAG Applications</span>
             <span>Time-Series Forecasting</span>
-            <span>Applied Research</span>
-            <span>Source-grounded AI</span>
+            <span>Federated Learning</span>
             <span>Computer Vision</span>
-            <span>Indonesian NLP</span>
+            <span>Natural Language Processing</span>
+            <span>RAG Applications</span>
             <span>Time-Series Forecasting</span>
-            <span>Applied Research</span>
+            <span>Federated Learning</span>
           </div>
         </div>
 
         <div class="curated-profile">
           <div>
             <p class="spaced-copy">
-              Bridging research discipline and product-minded engineering through AI systems that
-              stay traceable, evaluated, and useful beyond the notebook.
+              Bringing research and engineering together to develop AI systems
+              that are carefully evaluated and practical to use.
             </p>
           </div>
 
@@ -569,11 +853,11 @@ onUnmounted(() => {
               <span></span>
             </div>
             <pre><code>&gt; boot aditya-akbar.profile
-role      : applied AI builder
+role      : AI Engineering / ML Research
 base      : Malang, Indonesia
-focus     : RAG / CV / NLP / forecasting
-lab       : Intelligent Systems Lab
-output    : explainable prototypes</code></pre>
+focus     : Computer Vision / NLP / RAG / Forecasting
+lab       : Intelligent Systems Laboratory, FILKOM UB
+output    : Research Projects & AI Applications</code></pre>
           </div>
         </div>
 
@@ -583,18 +867,20 @@ output    : explainable prototypes</code></pre>
       </section>
 
       <section id="about" class="section split-section">
-        <div data-reveal>
-          <p class="eyebrow">About Me</p>
-          <h2>Turning messy real-world data into <span>inspectable AI tools.</span></h2>
+        <div class="about-heading">
+          <div data-reveal>
+            <p class="eyebrow">About Me</p>
+            <h2>Turning messy real-world data into <span>meaningful AI solutions.</span></h2>
+          </div>
         </div>
         <div class="body-copy" data-reveal>
           <p>
-            I work across applied AI product workflows: data preprocessing, experimentation, model
-            evaluation, technical documentation, and clean Python-based implementation.
+            My work involves preparing datasets, developing machine learning models, running experiments, and evaluating results.
+            I also focus on understanding model limitations and documenting findings throughout the development process.
           </p>
           <p>
-            My projects cover biometric security, medical imaging, air quality forecasting,
-            Indonesian NLP, document-grounded retrieval, and privacy-aware AI companion systems.
+            I've worked on projects involving 3D brain tumor segmentation, document-based question answering, face anti-spoofing,
+            identity card OCR, geospatial fire monitoring, and Indonesian-language NLP applications.
           </p>
           <ul class="achievement-list">
             <li v-for="achievement in achievements" :key="achievement.title">
@@ -616,8 +902,7 @@ output    : explainable prototypes</code></pre>
           <p class="eyebrow">Tech Stack</p>
           <h2>Tools & <span>technologies</span></h2>
           <p>
-            A focused toolkit for building machine learning experiments, AI prototypes, and
-            deployable data applications.
+            Libraries, frameworks, and technologies I've used across machine learning research and AI development.
           </p>
         </div>
 
@@ -637,12 +922,12 @@ output    : explainable prototypes</code></pre>
         </div>
       </section>
 
-      <section id="services" class="section services-section">
+      <section id="expertise" class="section services-section">
         <div class="section-heading centered" data-reveal>
-          <p class="eyebrow">Services</p>
-          <h2>What I <span>offer</span></h2>
+          <p class="eyebrow">Expertise</p>
+          <h2>What I <span>Work On</span></h2>
           <p>
-            Practical AI, data, and backend work shaped around readable outputs and usable demos.
+            My work spans machine learning, natural language processing, computer vision, and application development.
           </p>
         </div>
 
@@ -660,9 +945,19 @@ output    : explainable prototypes</code></pre>
                 <strong>{{ service.title }}</strong>
                 <small>{{ service.description }}</small>
               </span>
-              <span class="summary-icon">+</span>
+              <span class="summary-icon" aria-hidden="true">+</span>
             </summary>
-            <p>{{ service.details }}</p>
+            <div class="service-areas">
+              <p class="service-areas-label">Areas of Work</p>
+              <ul class="service-areas-list">
+                <li v-for="area in service.areas" :key="area">
+                  <svg class="service-area-check" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="m4 10 4 4 8-8" />
+                  </svg>
+                  <span>{{ area }}</span>
+                </li>
+              </ul>
+            </div>
           </details>
         </div>
       </section>
@@ -670,29 +965,34 @@ output    : explainable prototypes</code></pre>
       <section id="experience" class="section experience-section">
         <div class="section-heading centered" data-reveal>
           <p class="eyebrow">Experience</p>
-          <h2>Practice. <span>Build.</span> Iterate.</h2>
+          <h2>Work <span>Experience</span></h2>
           <p>
-            A compact timeline of research, leadership, and project practice behind the portfolio.
+            My work in data science, research, mentoring, and AI engineering, from earliest to most recent.
           </p>
         </div>
 
-        <div class="experience-list">
-          <article
+        <ol class="experience-timeline" aria-label="Professional experience, earliest to most recent">
+          <li
             v-for="(item, index) in experienceItems"
-            :key="item.role"
-            class="experience-item"
-            :style="revealDelay(index, 90)"
+            :key="`${item.place}-${item.role}`"
+            class="timeline-entry"
+            :style="revealDelay(index, 50)"
             data-reveal
           >
-            <span class="experience-period">{{ item.period }}</span>
-            <span class="experience-logo" aria-hidden="true">
-              <span>{{ item.initials }}</span>
-              <img :src="item.logo" alt="" @error="hideBrokenImage" />
-            </span>
-            <div class="experience-copy">
-              <h3>{{ item.role }}</h3>
-              <p class="experience-place">{{ item.place }}</p>
-              <p>{{ item.note }}</p>
+            <span class="timeline-marker" aria-hidden="true"></span>
+            <article class="experience-item">
+              <header class="experience-header">
+                <span class="experience-logo" aria-hidden="true">
+                  <span>{{ item.initials }}</span>
+                  <img :src="item.logo" alt="" @error="hideBrokenImage" />
+                </span>
+                <div class="experience-copy">
+                  <h3>{{ item.place }}</h3>
+                  <p class="experience-role">{{ item.role }}</p>
+                  <p class="experience-period"><time :datetime="item.start">{{ item.period }}</time></p>
+                </div>
+              </header>
+              <p class="experience-note">{{ item.note }}</p>
               <a
                 class="experience-link"
                 :href="item.linkedin"
@@ -708,9 +1008,9 @@ output    : explainable prototypes</code></pre>
                   <path d="M7 17 17 7M9 7h8v8" />
                 </svg>
               </a>
-            </div>
-          </article>
-        </div>
+            </article>
+          </li>
+        </ol>
       </section>
 
       <section id="projects" class="section projects-section">
@@ -718,7 +1018,7 @@ output    : explainable prototypes</code></pre>
           <p class="eyebrow">Featured Work</p>
           <h2>Selected <span>projects</span></h2>
           <p>
-            A curated set of research, competition, and product-style prototypes from my GitHub.
+            Highlighted projects from my GitHub.
           </p>
         </div>
 
@@ -770,10 +1070,9 @@ output    : explainable prototypes</code></pre>
 
       <section id="contact" class="section contact-section" data-reveal>
         <p class="eyebrow">Contact</p>
-        <h2>Let's build applied AI that people can <span>trust.</span></h2>
+        <h2>Interested in working together? <span>Let's talk.</span></h2>
         <p>
-          Open for research collaboration, AI prototypes, competition work, and data product
-          experiments.
+          I'm open to research collaborations, AI engineering projects, and opportunities to work with new teams.
         </p>
         <div class="contact-actions">
           <a

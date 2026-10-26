@@ -1,11 +1,11 @@
 :root {
-  --color-page: #050505;
+  --color-page: #020617;
   --color-surface: #0f0f10;
   --color-surface-soft: #171718;
   --color-surface-raised: #1f1f21;
   --color-ink: #f7f7f8;
-  --color-muted: #a1a1aa;
-  --color-subtle: #71717a;
+  --color-muted: #bdcfe2;
+  --color-subtle: #8da5c0;
   --color-border: rgba(255, 255, 255, 0.11);
   --color-orange: #ff4d18;
   --color-orange-soft: rgba(255, 77, 24, 0.14);
@@ -31,11 +31,17 @@ body {
   min-height: 100vh;
   margin: 0;
   color: var(--color-ink);
-  background:
-    radial-gradient(circle at 14% 10%, rgba(255, 77, 24, 0.18), transparent 30%),
-    radial-gradient(circle at 86% 14%, rgba(114, 92, 255, 0.14), transparent 32%),
-    radial-gradient(circle at 52% 70%, rgba(0, 163, 163, 0.1), transparent 38%),
-    var(--color-page);
+  background: linear-gradient(
+    180deg,
+    #020617 0%,
+    #040d24 14%,
+    #091e3c 31%,
+    #10365e 48%,
+    #1c5685 64%,
+    #4389bb 79%,
+    #8ac3e6 91%,
+    #c6e6f4 100%
+  );
   font-family:
     Inter,
     ui-sans-serif,

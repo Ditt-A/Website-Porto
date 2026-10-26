@@ -1,25 +1,40 @@
 # Portfolio image assets
 
-Place project screenshots in `public/images/projects/`:
+Project previews referenced by `src/App.vue`:
 
-- `dsn-mui-rag.webp`
-- `brain-tumour-segmentation.webp`
-- `face-spoofing-detection.webp`
-- `airsafe-school.webp`
-- `leksara.webp`
-- `ai-moodband.webp`
+- `projects/brain.png` — Brain Tumour Segmentation
+- `projects/amana.png` — AMANA / DSN-MUI UMKM RAG
+- `projects/spoofing.png` — Face Spoofing Detection
+- `projects/ocr.png` — Robust Identity Card OCR
+- `projects/firewatch.png` — Kalimantan FireWatch
+- `projects/AI-Moodband.jpeg` — Senandika / AI-MoodBand
 
-Recommended project image size: **1600 x 900 px** (WebP, 16:9).
+Organization and competition logos referenced by `src/App.vue` are stored in `logos/`. Missing logos fall back to initials.
 
-Place organization and university logos in `public/images/logos/`:
+Experience logo sources:
 
-- `is-lab.png`
-- `bcc-filkom.png`
-- `gdgoc.png`
-- `ugm.png`
-- `itb.png`
-- `telkom-university.png`
+- `logos/pertamina-patra-niaga.svg`: https://pertaminapatraniaga.com/images/pertamina.svg
+- `logos/komdigi.svg`: https://commons.wikimedia.org/wiki/File:Logo_Kementerian_Komunikasi_dan_Digital_Republik_Indonesia_(2024).svg
 
-Use a transparent PNG or SVG with a square canvas when possible. Missing files automatically fall back to initials, so the layout will not show a broken-image icon.
+The six realistic, transparent space decorations are stored in `space/`:
 
-To use another filename, update the corresponding `image` or `logo` value in `src/App.vue`.
+- `planet.png`
+- `asteroid.png`
+- `satellite.png`
+- `comet.png`
+- `moon.png`
+- `nebula.png`
+
+Their preview originals are in `C:\Users\USER\Downloads\WebPorto-Space-Icons-Realistic`.
+
+Five realistic, transparent daytime sky decorations are stored in `sky/`:
+
+- `cloud.png`
+- `balloon.png`
+- `plane.png`
+- `birds.png`
+- `sun.png`
+
+Their originals and generation prompts are in `C:\Users\USER\Downloads\WebPorto-Sky-Assets-Realistic`. They appear only in the lower sky area above the landscape, with bounded pointer and scroll movement.
+
+The generated AA favicon is served as `/favicon.ico` (16, 32, and 48 px), `/favicon-32.png`, and `/apple-touch-icon.png` (180 px). Its original artwork and prompt are in `C:\Users\USER\Downloads\WebPorto-Brand-Assets`.
