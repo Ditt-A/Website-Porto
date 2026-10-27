@@ -158,6 +158,10 @@
   transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.portfolio-shell[data-custom-cursor="false"] :is(.pointer-cursor, .cursor-light) {
+  visibility: hidden;
+}
+
 .ambient-stage {
   position: absolute;
   inset: 0 0 auto;

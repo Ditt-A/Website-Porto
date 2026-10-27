@@ -599,12 +599,16 @@ const updateScrollPosition = () => {
 const updatePointerPosition = (event: PointerEvent) => {
   if (prefersReducedMotion.value || event.pointerType === 'touch') return
 
-  cursorVisible.value = cursorAssetLoaded.value && Boolean(finePointerPreference?.matches)
-
-  if (event.target instanceof Element) {
-    cursorInteractive.value = Boolean(event.target.closest(interactiveSelector))
-    pointerCard = event.target.closest<HTMLElement>('.glass-card')
+  const { clientX, clientY } = event
+  const viewport = document.documentElement
+  if (clientX < 0 || clientY < 0 || clientX >= viewport.clientWidth || clientY >= viewport.clientHeight) {
+    resetPointerPosition()
+    return
   }
+
+  const target = event.type === 'pointerenter' ? document.elementFromPoint(clientX, clientY) : event.target
+  cursorInteractive.value = target instanceof Element && Boolean(target.closest(interactiveSelector))
+  pointerCard = target instanceof Element ? target.closest<HTMLElement>('.glass-card') : null
 
   latestPointer = {
     x: (event.clientX / window.innerWidth - 0.5) * 2,
@@ -620,19 +624,36 @@ const updatePointerPosition = (event: PointerEvent) => {
     pointerY.value = clamp(latestPointer.y, -1, 1)
     cursorX.value = latestPointer.clientX
     cursorY.value = latestPointer.clientY
+    cursorVisible.value = cursorAssetLoaded.value && Boolean(finePointerPreference?.matches)
     updateGlassGlare()
     pointerFrame = 0
   })
 }
 
 const resetPointerPosition = () => {
+  if (pointerFrame) {
+    window.cancelAnimationFrame(pointerFrame)
+    pointerFrame = 0
+  }
+
   pointerX.value = 0
   pointerY.value = 0
+  cursorX.value = -120
+  cursorY.value = -120
   cursorVisible.value = false
   cursorInteractive.value = false
   cursorPressed.value = false
   pointerCard = null
   clearGlassGlare()
+}
+
+const handlePointerOut = (event: PointerEvent) => {
+  // pointerout bubbles from the page; pointerleave on window does not.
+  if (event.relatedTarget === null) resetPointerPosition()
+}
+
+const handlePageVisibility = () => {
+  if (document.hidden) resetPointerPosition()
 }
 
 const updateMotionPreference = () => {
@@ -712,7 +733,10 @@ onMounted(() => {
 
   window.addEventListener('scroll', updateScrollPosition, { passive: true })
   window.addEventListener('pointermove', updatePointerPosition, { passive: true })
-  window.addEventListener('pointerleave', resetPointerPosition)
+  document.documentElement.addEventListener('pointerenter', updatePointerPosition)
+  document.documentElement.addEventListener('pointerleave', resetPointerPosition)
+  document.addEventListener('pointerout', handlePointerOut)
+  document.addEventListener('visibilitychange', handlePageVisibility)
   window.addEventListener('blur', resetPointerPosition)
   window.addEventListener('pointerdown', setCursorPressed)
   window.addEventListener('pointerup', releaseCursorPressed)
@@ -749,7 +773,10 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateAmbientBounds)
   window.removeEventListener('scroll', updateScrollPosition)
   window.removeEventListener('pointermove', updatePointerPosition)
-  window.removeEventListener('pointerleave', resetPointerPosition)
+  document.documentElement.removeEventListener('pointerenter', updatePointerPosition)
+  document.documentElement.removeEventListener('pointerleave', resetPointerPosition)
+  document.removeEventListener('pointerout', handlePointerOut)
+  document.removeEventListener('visibilitychange', handlePageVisibility)
   window.removeEventListener('blur', resetPointerPosition)
   window.removeEventListener('pointerdown', setCursorPressed)
   window.removeEventListener('pointerup', releaseCursorPressed)
