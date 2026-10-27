@@ -64,17 +64,6 @@
   animation: grassSway var(--wind-duration, 2.8s) ease-in-out var(--wind-delay, -1s) infinite;
 }
 
-.portfolio-shell::after {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  pointer-events: none;
-  content: "";
-  background: #f7f7f8;
-  transform-origin: top;
-  animation: pageCurtain 980ms 160ms cubic-bezier(0.83, 0, 0.17, 1) both;
-}
-
 .scroll-progress {
   position: fixed;
   top: 0;
@@ -358,7 +347,6 @@
   box-shadow: 0 20px 70px rgba(0, 0, 0, 0.44);
   transform: translateX(-50%);
   backdrop-filter: blur(16px);
-  animation: navDrop 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .nav-link {
@@ -475,7 +463,6 @@
   font-style: italic;
   font-weight: 800;
   transform-origin: 50% 82%;
-  animation: nameSweep 900ms 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .rolling-text {
@@ -520,29 +507,40 @@ summary:hover .rolling-text span {
 .hero-lede,
 .focus-pills,
 .hero-actions {
-  opacity: 0;
-  transform: translate3d(0, 28px, 0);
-  animation: heroRise 740ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 1;
+  transform: none;
 }
 
-.hero-copy > .eyebrow {
-  animation-delay: 130ms;
+.portfolio-shell[data-intro="playing"] :is(.hero-copy > .eyebrow, .hero-copy h1, .hero-lede, .focus-pills, .hero-actions) {
+  animation: heroRise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.hero-copy h1 {
-  animation-delay: 250ms;
+.portfolio-shell[data-intro="playing"] .hero-copy > .eyebrow {
+  animation-delay: 1000ms;
 }
 
-.hero-lede {
-  animation-delay: 430ms;
+.portfolio-shell[data-intro="playing"] .hero-copy h1 {
+  animation: warpTitleIn 680ms 1080ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.focus-pills {
-  animation-delay: 570ms;
+.portfolio-shell[data-intro="playing"] .hero-lede {
+  animation-delay: 1260ms;
 }
 
-.hero-actions {
-  animation-delay: 690ms;
+.portfolio-shell[data-intro="playing"] .focus-pills {
+  animation-delay: 1340ms;
+}
+
+.portfolio-shell[data-intro="playing"] .hero-actions {
+  animation-delay: 1420ms;
+}
+
+.portfolio-shell[data-intro="playing"] .hero-visual {
+  animation: portraitEnter 700ms 1180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.portfolio-shell[data-intro="playing"] .site-nav {
+  animation: navDrop 560ms 1320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .focus-pills,
@@ -640,7 +638,6 @@ summary:hover .rolling-text span {
     rotateX(var(--tilt-x, 0deg))
     rotateY(var(--tilt-y, 0deg));
   transform-style: preserve-3d;
-  animation: portraitEnter 900ms 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: transform;
 }
 
@@ -1850,16 +1847,6 @@ summary:hover .rolling-text span {
   }
 }
 
-@keyframes pageCurtain {
-  0% {
-    transform: scaleY(1);
-  }
-
-  100% {
-    transform: scaleY(0);
-  }
-}
-
 @keyframes heroRise {
   from {
     opacity: 0;
@@ -1872,25 +1859,13 @@ summary:hover .rolling-text span {
   }
 }
 
-@keyframes nameSweep {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 18px, 0) rotate(-2deg);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0);
-  }
-}
-
 @keyframes portraitEnter {
   from {
     opacity: 0;
     transform: translate3d(34px, 42px, 0)
       rotateX(var(--tilt-x, 0deg))
       rotateY(var(--tilt-y, 0deg))
-      scale(0.96);
+      scale(1.06);
   }
 
   to {
@@ -1899,6 +1874,18 @@ summary:hover .rolling-text span {
       rotateX(var(--tilt-x, 0deg))
       rotateY(var(--tilt-y, 0deg))
       scale(1);
+  }
+}
+
+@keyframes warpTitleIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 

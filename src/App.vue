@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { images } from './assets/images'
+import WarpArrival from './components/WarpArrival.vue'
 
 type Project = {
   title: string
@@ -384,6 +385,8 @@ const cursorInteractive = ref(false)
 const cursorPressed = ref(false)
 const cursorAssetLoaded = ref(false)
 const prefersReducedMotion = ref(false)
+const introPlaying = ref(false)
+const introSessionKey = 'aditya-warp-arrival-v1'
 const spaceStage = ref<HTMLElement | null>(null)
 const spaceBounds = ref({ width: 0, height: 0, viewportHeight: 0 })
 const skyStage = ref<HTMLElement | null>(null)
@@ -397,6 +400,7 @@ const activeExperience = ref(-1)
 
 let scrollFrame = 0
 let pointerFrame = 0
+let introTimer: number | undefined
 let revealObserver: IntersectionObserver | undefined
 let ambientBoundsObserver: ResizeObserver | undefined
 let sceneObserver: IntersectionObserver | undefined
@@ -572,6 +576,7 @@ const interactiveSelector = [
 ].join(',')
 
 const updateScrollPosition = () => {
+  if (introPlaying.value && window.scrollY > 8) finishIntro()
   if (scrollFrame) return
 
   scrollFrame = window.requestAnimationFrame(() => {
@@ -658,16 +663,51 @@ const handlePointerOut = (event: PointerEvent) => {
 }
 
 const handlePageVisibility = () => {
-  if (document.hidden) resetPointerPosition()
+  if (document.hidden) {
+    resetPointerPosition()
+    finishIntro()
+  }
+}
+
+const finishIntro = () => {
+  introPlaying.value = false
+  if (introTimer !== undefined) window.clearTimeout(introTimer)
+  introTimer = undefined
+  document.removeEventListener('keydown', handleIntroKeydown)
+}
+
+const handleIntroKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' || event.key === 'Tab') finishIntro()
+}
+
+const startIntro = () => {
+  if (prefersReducedMotion.value || window.location.pathname !== '/') return
+  if ((window.location.hash && window.location.hash !== '#home') || window.scrollY > 16) return
+
+  try {
+    if (window.sessionStorage.getItem(introSessionKey) === 'seen') return
+    window.sessionStorage.setItem(introSessionKey, 'seen')
+  } catch {
+    // Storage restrictions must never prevent access to the page.
+  }
+
+  introPlaying.value = true
+  document.addEventListener('keydown', handleIntroKeydown)
+  // Fallback for interrupted or disabled CSS animation events.
+  introTimer = window.setTimeout(finishIntro, 2300)
 }
 
 const updateMotionPreference = () => {
   prefersReducedMotion.value = motionPreference?.matches ?? false
-  if (prefersReducedMotion.value) resetPointerPosition()
+  if (prefersReducedMotion.value) {
+    resetPointerPosition()
+    finishIntro()
+  }
   updateScrollPosition()
 }
 
 const setCursorPressed = () => {
+  if (introPlaying.value) finishIntro()
   cursorPressed.value = true
 }
 
@@ -725,6 +765,7 @@ onMounted(() => {
   motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
   finePointerPreference = window.matchMedia('(hover: hover) and (pointer: fine)')
   updateMotionPreference()
+  startIntro()
   motionPreference.addEventListener('change', updateMotionPreference)
   finePointerPreference.addEventListener('change', resetPointerPosition)
 
@@ -775,6 +816,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  finishIntro()
   window.removeEventListener('resize', updateAmbientBounds)
   window.removeEventListener('scroll', updateScrollPosition)
   window.removeEventListener('pointermove', updatePointerPosition)
@@ -807,7 +849,9 @@ onUnmounted(() => {
     class="portfolio-shell"
     :style="shellStyle"
     :data-custom-cursor="cursorAssetLoaded && cursorVisible && !prefersReducedMotion"
+    :data-intro="introPlaying ? 'playing' : 'ready'"
   >
+    <WarpArrival v-if="introPlaying" @complete="finishIntro" />
     <div class="scroll-progress" aria-hidden="true">
       <span></span>
     </div>
