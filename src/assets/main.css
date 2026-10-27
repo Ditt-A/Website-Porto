@@ -293,12 +293,25 @@
   animation-name: sunPulse;
 }
 
-.ambient-stage:not(.is-in-view) .space-object img,
-.atmosphere-stage:not(.is-in-view) .atmosphere-cloud img,
-.sky-stage:not(.is-in-view) .sky-object img,
-.landscape-hills:not(.is-in-view) .tree-sway,
-.landscape-hills:not(.is-in-view) .grass-sway {
+.ambient-stage:not([data-motion-active]) .space-object img,
+.atmosphere-stage:not([data-motion-active]) .atmosphere-cloud img,
+.sky-stage:not([data-motion-active]) .sky-object img,
+.landscape-hills:not([data-motion-active]) .tree-sway,
+.landscape-hills:not([data-motion-active]) .grass-sway,
+.hero-section:not([data-motion-active]) :is(.availability-panel, .status-dot),
+.editorial-band:not([data-motion-active]) .marquee-track,
+.project-card:not([data-motion-active]) .project-preview::before,
+.project-card:not([data-motion-active]) .preview-lines span {
   animation-play-state: paused;
+}
+
+.ambient-stage:not([data-motion-active]) .space-object,
+.atmosphere-stage:not([data-motion-active]) .atmosphere-cloud,
+.sky-stage:not([data-motion-active]) .sky-object,
+.hero-section:not([data-motion-active]) .hero-visual,
+.editorial-band:not([data-motion-active]) .terminal-card,
+.project-card:not([data-motion-active]) {
+  will-change: auto;
 }
 
 .glass-card {
@@ -415,6 +428,7 @@
   filter: blur(0);
   clip-path: inset(0);
   transform: translate3d(0, 0, 0) scale(1);
+  will-change: auto;
 }
 
 .section {
@@ -1389,6 +1403,7 @@ summary:hover .rolling-text span {
   opacity: 1;
   filter: blur(0);
   transform: translate3d(0, 0, 0);
+  will-change: auto;
 }
 
 .timeline-entry.is-visible::before,
@@ -1769,6 +1784,8 @@ summary:hover .rolling-text span {
   color: var(--color-muted);
   font-size: 1.2rem;
   font-weight: 600;
+  text-align: justify;
+  text-align-last: center;
 }
 
 .contact-actions {

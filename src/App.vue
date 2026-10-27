@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import profilePhoto from './assets/profile.jpg'
+import { images } from './assets/images'
 
 type Project = {
   title: string
@@ -62,20 +62,20 @@ type SkyObject = SpaceObject & {
 }
 
 const spaceObjects: SpaceObject[] = [
-  { id: 'planet', image: '/images/space/planet.png', x: 0.07, y: 0.045, size: 190, rotation: -8, depth: 14, speed: -0.045, parallaxRange: 40, opacity: 0.72, duration: 12 },
-  { id: 'moon', image: '/images/space/moon.png', x: 0.93, y: 0.3, size: 122, rotation: 12, depth: -7, speed: 0.02, parallaxRange: 22, opacity: 0.7, duration: 15 },
-  { id: 'asteroid', image: '/images/space/asteroid.png', x: 0.06, y: 0.52, size: 104, rotation: -16, depth: 16, speed: -0.075, parallaxRange: 58, opacity: 0.7, duration: 11 },
-  { id: 'satellite', image: '/images/space/satellite.png', x: 0.93, y: 0.7, size: 162, rotation: 10, depth: -14, speed: 0.05, parallaxRange: 42, opacity: 0.72, duration: 14 },
-  { id: 'comet', image: '/images/space/comet.png', x: 0.82, y: 0.03, size: 138, rotation: 10, depth: -10, speed: -0.03, parallaxRange: 30, opacity: 0.58, duration: 16 },
-  { id: 'nebula', image: '/images/space/nebula.png', x: 0.22, y: 0.86, size: 240, rotation: -4, depth: 4, speed: 0.012, parallaxRange: 14, opacity: 0.3, duration: 20 },
+  { id: 'planet', image: images.spacePlanet, x: 0.07, y: 0.045, size: 190, rotation: -8, depth: 14, speed: -0.045, parallaxRange: 40, opacity: 0.72, duration: 12 },
+  { id: 'moon', image: images.spaceMoon, x: 0.93, y: 0.3, size: 122, rotation: 12, depth: -7, speed: 0.02, parallaxRange: 22, opacity: 0.7, duration: 15 },
+  { id: 'asteroid', image: images.spaceAsteroid, x: 0.06, y: 0.52, size: 104, rotation: -16, depth: 16, speed: -0.075, parallaxRange: 58, opacity: 0.7, duration: 11 },
+  { id: 'satellite', image: images.spaceSatellite, x: 0.93, y: 0.7, size: 162, rotation: 10, depth: -14, speed: 0.05, parallaxRange: 42, opacity: 0.72, duration: 14 },
+  { id: 'comet', image: images.spaceComet, x: 0.82, y: 0.03, size: 138, rotation: 10, depth: -10, speed: -0.03, parallaxRange: 30, opacity: 0.58, duration: 16 },
+  { id: 'nebula', image: images.spaceNebula, x: 0.22, y: 0.86, size: 240, rotation: -4, depth: 4, speed: 0.012, parallaxRange: 14, opacity: 0.3, duration: 20 },
 ]
 
 const skyObjects: SkyObject[] = [
-  { id: 'cloud', image: '/images/sky/cloud.png', x: 0.1, mobileX: 0.2, y: 0.1, size: 420, aspectRatio: 2, rotation: -2, depth: 16, speed: -0.12, parallaxRange: 72, opacity: 0.42, duration: 30 },
-  { id: 'balloon', image: '/images/sky/balloon.png', x: 0.93, mobileX: 0.84, y: 0.32, size: 155, aspectRatio: 2 / 3, rotation: 3, depth: -10, speed: -0.055, parallaxRange: 44, opacity: 0.72, duration: 18 },
-  { id: 'plane', image: '/images/sky/plane.png', x: 0.07, mobileX: 0.18, y: 0.51, size: 245, aspectRatio: 1.5, rotation: -2, depth: 9, speed: 0.035, parallaxRange: 28, opacity: 0.6, duration: 42 },
-  { id: 'birds', image: '/images/sky/birds.png', x: 0.83, mobileX: 0.74, y: 0.71, size: 330, aspectRatio: 2, rotation: 0, depth: -6, speed: -0.018, parallaxRange: 18, opacity: 0.62, duration: 56 },
-  { id: 'sun', image: '/images/sky/sun.png', x: 0.88, mobileX: 0.83, y: 0.91, size: 330, aspectRatio: 1.5, rotation: 0, depth: -3, speed: 0.008, parallaxRange: 8, opacity: 0.5, duration: 10 },
+  { id: 'cloud', image: images.skyCloud, x: 0.1, mobileX: 0.2, y: 0.1, size: 420, aspectRatio: 2, rotation: -2, depth: 16, speed: -0.12, parallaxRange: 72, opacity: 0.42, duration: 30 },
+  { id: 'balloon', image: images.skyBalloon, x: 0.93, mobileX: 0.84, y: 0.32, size: 155, aspectRatio: 2 / 3, rotation: 3, depth: -10, speed: -0.055, parallaxRange: 44, opacity: 0.72, duration: 18 },
+  { id: 'plane', image: images.skyPlane, x: 0.07, mobileX: 0.18, y: 0.51, size: 245, aspectRatio: 1.5, rotation: -2, depth: 9, speed: 0.035, parallaxRange: 28, opacity: 0.6, duration: 42 },
+  { id: 'birds', image: images.skyBirds, x: 0.83, mobileX: 0.74, y: 0.71, size: 330, aspectRatio: 2, rotation: 0, depth: -6, speed: -0.018, parallaxRange: 18, opacity: 0.62, duration: 56 },
+  { id: 'sun', image: images.skySun, x: 0.88, mobileX: 0.83, y: 0.91, size: 330, aspectRatio: 1.5, rotation: 0, depth: -3, speed: 0.008, parallaxRange: 8, opacity: 0.5, duration: 10 },
 ]
 
 const hillTrees = {
@@ -203,7 +203,7 @@ const projects: Project[] = [
     stack: ['Medical Imaging', 'Segmentation', 'PyTorch'],
     link: 'https://github.com/Ditt-A/BrainTumourSegmentation',
     accent: 'vision',
-    image: '/images/projects/brain.png',
+    image: images.projectBrain,
   },
   {
     title: 'AMANA / DSN-MUI UMKM RAG',
@@ -212,7 +212,7 @@ const projects: Project[] = [
     stack: ['RAG', 'Hybrid Retrieval', 'Qwen3-VL'],
     link: 'https://github.com/Ditt-A/DSNMUI_RAG',
     accent: 'rag',
-    image: '/images/projects/amana.png',
+    image: images.projectAmana,
   },
   {
     title: 'Face Spoofing Detection',
@@ -221,7 +221,7 @@ const projects: Project[] = [
     stack: ['Computer Vision', 'Anti-Spoofing', 'Ensemble'],
     link: 'https://github.com/Ditt-A/Face-Spoofing-Detection',
     accent: 'security',
-    image: '/images/projects/spoofing.png',
+    image: images.projectSpoofing,
   },
   {
     title: 'Robust Identity Card OCR',
@@ -230,7 +230,7 @@ const projects: Project[] = [
     stack: ['OCR', 'Document Understanding', 'Computer Vision'],
     link: 'https://github.com/Ditt-A/RobustIdentityCardOCR',
     accent: 'nlp',
-    image: '/images/projects/ocr.png',
+    image: images.projectOcr,
   },
   {
     title: 'Kalimantan FireWatch',
@@ -239,7 +239,7 @@ const projects: Project[] = [
     stack: ['Geospatial Data', 'FastAPI', 'Next.js'],
     link: 'https://github.com/Ditt-A/Kalimantan-FireWatch',
     accent: 'forecast',
-    image: '/images/projects/firewatch.png',
+    image: images.projectFirewatch,
   },
   {
     title: 'Senandika / AI-MoodBand',
@@ -248,7 +248,7 @@ const projects: Project[] = [
     stack: ['Flask', 'Gemini', 'FAISS'],
     link: 'https://github.com/Ditt-A/AI-MoodBand',
     accent: 'memory',
-    image: '/images/projects/AI-Moodband.jpeg',
+    image: images.projectMoodband,
   },
 ]
 
@@ -256,31 +256,31 @@ const achievements: Achievement[] = [
   {
     title: '1st Winner — Data Science, Sebelas Maret Statistics Fair 2026',
     organizer: 'Universitas Sebelas Maret · Sep 2026',
-    logo: '/images/logos/uns.png',
+    logo: images.logoUns,
     initials: 'UNS',
   },
   {
     title: 'Top 8 Semifinalist — Datathon RISTEK UI 2026',
     organizer: 'Universitas Indonesia · Aug 2026',
-    logo: '/images/logos/ui.png',
+    logo: images.logoUi,
     initials: 'UI',
   },
   {
     title: '1st Honorable Mention — International Data Science FIT Competition 2026',
     organizer: 'Universitas Kristen Satya Wacana · Jul 2026',
-    logo: '/images/logos/uksw.png',
+    logo: images.logoUksw,
     initials: 'UKSW',
   },
   {
     title: 'Finalist — Data Analytics Competition, FIND IT! 2026',
     organizer: 'Universitas Gadjah Mada · May 2026',
-    logo: '/images/logos/ugm.jpg',
+    logo: images.logoUgm,
     initials: 'UGM',
   },
   {
     title: 'Top 7 Finalist — Datavidia Arkavidia 10.0',
     organizer: 'Institut Teknologi Bandung · Mar 2026',
-    logo: '/images/logos/itb.png',
+    logo: images.logoItb,
     initials: 'ITB',
   },
 ]
@@ -294,7 +294,7 @@ const experienceItems: Experience[] = [
     role: 'Data Scientist & Vice Head of Talent Development',
     place: 'BCC FILKOM Universitas Brawijaya',
     note: 'Progressed from Data Science Intern to Data Scientist while leading talent development, the 2025 Data Science Mini Bootcamp for 120 participants, and BCC Open Recruitment 2026.',
-    logo: '/images/logos/bcc.jpg',
+    logo: images.logoBcc,
     initials: 'BCC',
     linkedin: 'https://www.linkedin.com/company/bccfilkomub/posts/?feedView=all',
   },
@@ -304,7 +304,7 @@ const experienceItems: Experience[] = [
     role: 'AI Researcher',
     place: 'Intelligent Systems Laboratory, FILKOM UB',
     note: 'Progressed from Research Intern to AI Researcher, conducting deep-learning experiments, model evaluation, and scientific reporting in computer vision, medical imaging, and NLP.',
-    logo: '/images/logos/is-lab.jpg',
+    logo: images.logoIsLab,
     initials: 'IS',
     linkedin: 'https://www.linkedin.com/company/labsc-ub/',
   },
@@ -314,7 +314,7 @@ const experienceItems: Experience[] = [
     role: 'Machine Learning Mentor',
     place: 'Google Developer Groups on Campus (GDGoC)',
     note: 'Mentored 240 participants through Machine Learning Study Jams covering preprocessing, visualization, machine-learning workflows, deep learning, and introductory computer vision.',
-    logo: '/images/logos/gdgoc.jpg',
+    logo: images.logoGdgoc,
     initials: 'GDG',
     linkedin: 'https://www.linkedin.com/company/gdgcub/',
   },
@@ -324,7 +324,7 @@ const experienceItems: Experience[] = [
     role: 'AI Engineer Intern',
     place: 'PT Pertamina Patra Niaga',
     note: 'Contributing to AI engineering work involving large language models, retrieval-augmented generation, automation, and GraphQL-based workflows.',
-    logo: '/images/logos/pertamina-patra-niaga.svg',
+    logo: images.logoPertamina,
     initials: 'PPN',
     linkedin: 'https://www.linkedin.com/company/ptpertaminapatraniaga/',
   },
@@ -334,7 +334,7 @@ const experienceItems: Experience[] = [
     role: 'AI Engineer Intern',
     place: 'AI Talent Factory (AITF), Komdigi',
     note: 'Fine-tuned expressive Indonesian TTS models for four voices; developing integration with animated 2D virtual teacher avatars for educational content.',
-    logo: '/images/logos/komdigi.svg',
+    logo: images.logoKomdigi,
     initials: 'AITF',
     linkedin: 'https://www.linkedin.com/company/ministry-of-communication-and-information-technology-of-the-republic-of-indonesia/?originalSubdomain=id',
   },
@@ -405,11 +405,18 @@ let finePointerPreference: MediaQueryList | undefined
 let activeGlareCard: HTMLElement | null = null
 let pointerCard: HTMLElement | null = null
 let timelineMetrics = { top: 0, height: 0, markers: [] as number[] }
+let sectionPositions: { id: string; top: number }[] = []
 let latestPointer = { x: 0, y: 0, clientX: 0, clientY: 0 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
 const updateAmbientBounds = () => {
+  // Cache section geometry on layout changes instead of reading layout on every scroll frame.
+  sectionPositions = sectionIds.flatMap((id) => {
+    const section = document.getElementById(id)
+    return section ? [{ id, top: section.getBoundingClientRect().top + window.scrollY }] : []
+  })
+
   if (spaceStage.value) {
     spaceBounds.value = {
       width: spaceStage.value.clientWidth,
@@ -583,10 +590,8 @@ const updateScrollPosition = () => {
     })
     activeExperience.value = reached
 
-    sectionIds.forEach((id) => {
-      const section = document.getElementById(id)
-
-      if (section && section.getBoundingClientRect().top <= activeOffset) {
+    sectionPositions.forEach(({ id, top }) => {
+      if (top <= scrollY.value + activeOffset) {
         currentSection = id
       }
     })
@@ -762,9 +767,9 @@ onMounted(() => {
   })
 
   sceneObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => entry.target.classList.toggle('is-in-view', entry.isIntersecting))
+    entries.forEach((entry) => entry.target.toggleAttribute('data-motion-active', entry.isIntersecting))
   }, { rootMargin: '120px', threshold: 0 })
-  document.querySelectorAll('.ambient-stage, .atmosphere-stage, .sky-stage, .landscape-hills').forEach((element) => {
+  document.querySelectorAll('.ambient-stage, .atmosphere-stage, .sky-stage, .landscape-hills, .hero-section, .editorial-band, .project-card').forEach((element) => {
     sceneObserver?.observe(element)
   })
 })
@@ -810,7 +815,7 @@ onUnmounted(() => {
     <div class="pointer-cursor" aria-hidden="true">
       <img
         class="cursor-magnifier"
-        src="/images/cursor/magnifier.png"
+        :src="images.magnifier"
         alt=""
         width="192"
         height="192"
@@ -829,17 +834,24 @@ onUnmounted(() => {
         :class="`space-${object.id}`"
         :style="spaceObjectStyle(object)"
       >
-        <img :src="object.image" alt="" decoding="async" draggable="false" />
+        <img
+          :src="object.image"
+          alt=""
+          :loading="object.id === 'planet' || object.id === 'comet' ? 'eager' : 'lazy'"
+          fetchpriority="low"
+          decoding="async"
+          draggable="false"
+        />
       </span>
     </div>
 
     <div ref="atmosphereStage" class="atmosphere-stage" :style="atmosphereStyle" aria-hidden="true">
       <span class="atmosphere-haze"></span>
       <span class="atmosphere-cloud atmosphere-cloud-far">
-        <img src="/images/sky/cloud.png" alt="" loading="lazy" decoding="async" draggable="false" />
+        <img :src="images.skyCloud" alt="" loading="lazy" decoding="async" draggable="false" />
       </span>
       <span class="atmosphere-cloud atmosphere-cloud-near">
-        <img src="/images/sky/cloud.png" alt="" loading="lazy" decoding="async" draggable="false" />
+        <img :src="images.skyCloud" alt="" loading="lazy" decoding="async" draggable="false" />
       </span>
     </div>
 
@@ -983,7 +995,16 @@ onUnmounted(() => {
         </div>
 
         <div class="hero-visual" :style="heroVisualStyle" aria-label="Aditya Akbar portrait">
-          <img :src="profilePhoto" alt="Aditya Akbar" />
+          <img
+            :src="images.profile"
+            :srcset="`${images.profile} 1x, ${images.profileRetina} 2x`"
+            alt="Aditya Akbar"
+            width="720"
+            height="1280"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
           <div class="availability-panel">
             <span class="status-dot"></span>
             <p>AI Researcher at Intelligent Systems Laboratory, FILKOM UBB</p>
@@ -1074,7 +1095,7 @@ output    : Research Projects & AI Applications</code></pre>
             <li v-for="achievement in achievements" :key="achievement.title" class="glass-card">
               <span class="achievement-logo" aria-hidden="true">
                 <span>{{ achievement.initials }}</span>
-                <img :src="achievement.logo" alt="" @error="hideBrokenImage" />
+                <img :src="achievement.logo" alt="" loading="lazy" decoding="async" @error="hideBrokenImage" />
               </span>
               <span class="achievement-copy">
                 <strong>{{ achievement.title }}</strong>
@@ -1179,7 +1200,7 @@ output    : Research Projects & AI Applications</code></pre>
               <header class="experience-header">
                 <span class="experience-logo" aria-hidden="true">
                   <span>{{ item.initials }}</span>
-                  <img :src="item.logo" alt="" @error="hideBrokenImage" />
+                  <img :src="item.logo" alt="" loading="lazy" decoding="async" @error="hideBrokenImage" />
                 </span>
                 <div class="experience-copy">
                   <h3>{{ item.place }}</h3>
@@ -1232,6 +1253,7 @@ output    : Research Projects & AI Applications</code></pre>
                 :src="project.image"
                 alt=""
                 loading="lazy"
+                decoding="async"
                 @error="hideBrokenImage"
               />
               <div class="preview-window">

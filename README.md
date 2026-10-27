@@ -40,3 +40,13 @@ npm run dev
 ```sh
 npm run build
 ```
+
+## Performance
+
+- Runtime raster images use resized WebP files, including transparent sky/space assets. The profile photo has 1x/2x variants and high fetch priority; lower-page images use lazy loading.
+- Images are imported from `src/assets/images.ts`, producing content-hashed URLs under `/assets/` instead of fixed public filenames.
+- `vercel.json` caches hashed assets for one year with `immutable`. HTML is revalidated on every visit, so a new deployment can reference new assets immediately. Unversioned favicons and the downloadable CV use shorter cache lifetimes.
+- Offscreen decorative, marquee, portrait-panel, and project-preview animations pause. Section geometry is refreshed when layout changes instead of being read on every scroll frame.
+- Reduced motion and native cursor fallbacks remain available.
+
+See `src/assets/images/README.md` for the image inventory and original-file locations.
