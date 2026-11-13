@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import WarpArrival from './components/WarpArrival.vue'
 import { images } from './assets/images'
 import { usePortfolioMotion, type SpaceObject, type SkyObject } from './composables/usePortfolioMotion'
 
@@ -358,6 +360,45 @@ const {
   activeSection, activeExperience, prefersReducedMotion,
   revealDelay, projectRevealStyle, handleCursorLoad, handleCursorError, handleProjectImageLoad,
 } = usePortfolioMotion({ sectionIds, spaceObjects, skyObjects })
+const startupPhase = ref<'loading' | 'playing' | 'ready'>('loading')
+let introTimeout: ReturnType<typeof setTimeout> | undefined
+const finishIntro = () => {
+  if (startupPhase.value === 'ready') return
+  clearTimeout(introTimeout)
+  startupPhase.value = 'ready'
+  window.dispatchEvent(new Event('portfolio:complete'))
+}
+const startIntro = async () => {
+  if (startupPhase.value !== 'loading') return
+  if (prefersReducedMotion.value) { finishIntro(); return }
+  startupPhase.value = 'playing'
+  await nextTick()
+  if (startupPhase.value !== 'playing') return
+  window.dispatchEvent(new Event('portfolio:intro-started'))
+  introTimeout = setTimeout(finishIntro, 2300)
+}
+const handleIntroKeydown = (event: KeyboardEvent) => {
+  if (startupPhase.value === 'playing' && (event.key === 'Escape' || event.key === 'Tab')) finishIntro()
+}
+const handleIntroVisibility = () => {
+  if (document.hidden && startupPhase.value === 'playing') finishIntro()
+}
+watch(prefersReducedMotion, (reduced) => {
+  if (reduced && startupPhase.value === 'playing') finishIntro()
+})
+onMounted(() => {
+  window.addEventListener('portfolio:intro', startIntro)
+  window.addEventListener('portfolio:skip-intro', finishIntro)
+  document.addEventListener('keydown', handleIntroKeydown)
+  document.addEventListener('visibilitychange', handleIntroVisibility)
+})
+onUnmounted(() => {
+  clearTimeout(introTimeout)
+  window.removeEventListener('portfolio:intro', startIntro)
+  window.removeEventListener('portfolio:skip-intro', finishIntro)
+  document.removeEventListener('keydown', handleIntroKeydown)
+  document.removeEventListener('visibilitychange', handleIntroVisibility)
+})
 </script>
 
 <template>
@@ -365,7 +406,9 @@ const {
     class="portfolio-shell"
     ref="portfolioShell"
     data-custom-cursor="false"
+    :data-intro="startupPhase"
   >
+    <WarpArrival v-if="startupPhase === 'playing'" @complete="finishIntro" />
     <div class="scroll-progress" aria-hidden="true">
       <span></span>
     </div>
@@ -541,7 +584,7 @@ const {
                 <span aria-hidden="true">See Projects</span>
               </span>
             </a>
-            <a class="secondary-action" href="/Aditya-Akbar-CV-NLP.pdf" target="_blank" rel="noopener">
+            <a class="secondary-action" href="/CV-Kalbe_Farma-AdityaAkbar.pdf" target="_blank" rel="noopener">
               <span class="rolling-text">
                 <span>Download CV</span>
                 <span aria-hidden="true">Download CV</span>

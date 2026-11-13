@@ -7,8 +7,11 @@ not a server-side model or API call.
 ## Changes
 
 - The black loading screen is in `index.html`, so it appears before application
-  JavaScript loads. `src/startup.ts` waits for Vue's first render and portrait/font
-  readiness, with a bounded 3.5-second wait. Open now releases the screen early.
+  JavaScript loads. It stays for at least one second. `src/startup.ts` waits for Vue's
+  first render and portrait/font readiness, with a bounded 3.5-second asset wait.
+  Open now skips that asset wait while preserving the minimum duration. The
+  original two-second Warp Arrival and hero entrance then run, before the page
+  is unlocked. Reduced motion skips the warp; Escape/Tab can dismiss it.
   Failure to load the app exposes Reload after 12 seconds. Reduced motion,
   keyboard focus, `aria-busy`, and inert content are handled explicitly.
 - `src/composables/usePortfolioMotion.ts` owns transient frame state. Only section,
@@ -20,14 +23,16 @@ not a server-side model or API call.
 - Scroll geometry is cached until layout changes; pointer-card geometry is read
   on entry before style writes. Star texture remains static. Reveals use opacity
   and transform without animated blur or clipping. Large backdrop blurs and the
-  old warp intro were removed; the visual content and links are preserved.
+  recurring repaint costs were reduced. The original warp intro is preserved as a
+  one-shot effect after loading; ambient motion pauses until it completes.
 - Existing hashed WebP assets and immutable Vercel asset caching are retained.
 
 ## Local comparison
 
 Measured against commit `587f081` using the same production-preview server,
 Chromium, 1440 × 900 viewport, and **4× CPU throttling**. Each interaction ran
-120 animation frames. Measurements include the page's ambient animation work.
+120 animation frames in steady state. These measurements were captured for the
+frame optimizations in `2fc1d72`, before the original one-shot opening was restored. Measurements include the page's ambient animation work.
 
 | Measurement | Before | After |
 |---|---:|---:|
@@ -51,3 +56,7 @@ image; those retain their own lazy loading.
 checks cover slow startup, early dismissal, an unavailable image, failed-script
 retry, reduced motion, cursor fallback, anchor navigation, accordions, timeline
 visibility, project images, CV download, and responsive overflow.
+
+The current CV is a byte-for-byte copy of the supplied PDF at
+`public/CV-Kalbe_Farma-AdityaAkbar.pdf`. The download uses this web URL, and the
+old URL redirects to it. The PDF is revalidated instead of given a one-hour cache.

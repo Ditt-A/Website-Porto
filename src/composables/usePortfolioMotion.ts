@@ -413,7 +413,12 @@ export function usePortfolioMotion(options: {
     })
   }
   const updatePointerPosition = (event: PointerEvent) => {
-    if (!motionEnabled() || document.hidden || event.pointerType === 'touch')
+    if (
+      !motionEnabled() ||
+      document.documentElement.hasAttribute('data-loading') ||
+      document.hidden ||
+      event.pointerType === 'touch'
+    )
       return
     const { clientX, clientY } = event
     if (

@@ -110,28 +110,87 @@
         const app = document.getElementById('app')
         const button = document.getElementById('loader-open')
         const status = document.getElementById('loader-status')
+        let shownAt = null
         let mounted = false,
+          assetsReady = false,
           skipped = false,
-          failed = false,
-          finished = false
-        const finish = () => {
+          failed = false
+        let introRequested = false,
+          finished = false,
+          restoreFocus = false
+        let minimumTimer, introFallback
+        const complete = () => {
           if (!mounted || finished) return
           finished = true
           clearTimeout(fallback)
+          clearTimeout(minimumTimer)
+          clearTimeout(introFallback)
           document.documentElement.removeAttribute('data-loading')
           app.removeAttribute('inert')
           app.setAttribute('aria-busy', 'false')
-          if (document.activeElement === button) {
+          if (restoreFocus || document.activeElement === button) {
             const heading = app.querySelector('h1')
             heading?.setAttribute('tabindex', '-1')
             heading?.focus({ preventScroll: true })
           }
-          loader.setAttribute('aria-hidden', 'true')
-          loader.classList.add('is-leaving')
-          setTimeout(() => loader.remove(), 260)
+          if (loader.isConnected) {
+            loader.setAttribute('aria-hidden', 'true')
+            loader.classList.add('is-leaving')
+            setTimeout(() => loader.remove(), 260)
+          }
+        }
+        const beginIntro = () => {
+          if (
+            !mounted ||
+            !(assetsReady || skipped) ||
+            introRequested ||
+            finished
+          )
+            return
+          if (shownAt === null) return
+          const remaining = 1000 - (performance.now() - shownAt)
+          if (remaining > 0) {
+            clearTimeout(minimumTimer)
+            minimumTimer = setTimeout(beginIntro, remaining)
+            return
+          }
+          introRequested = true
+          restoreFocus = document.activeElement === button
+          clearTimeout(fallback)
+          introFallback = setTimeout(() => {
+            window.dispatchEvent(new Event('portfolio:skip-intro'))
+            complete()
+          }, 3500)
+          window.dispatchEvent(new Event('portfolio:intro'))
+        }
+        const markVisible = (time) => {
+          if (shownAt !== null) return
+          shownAt = time
+          beginIntro()
+        }
+        try {
+          const paintObserver = new PerformanceObserver((list) => {
+            const paint = list
+              .getEntries()
+              .find((entry) => entry.name === 'first-paint')
+            if (!paint) return
+            markVisible(paint.startTime)
+            paintObserver.disconnect()
+          })
+          if (!PerformanceObserver.supportedEntryTypes.includes('paint'))
+            throw new Error('Paint timing unavailable')
+          paintObserver.observe({ type: 'paint', buffered: true })
+        } catch {
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => markVisible(performance.now())),
+          )
         }
         const fallback = setTimeout(() => {
-          if (mounted) return finish()
+          if (mounted) {
+            assetsReady = true
+            beginIntro()
+            return
+          }
           failed = true
           status.textContent = 'The page could not load. Please try again.'
           button.textContent = 'Reload'
@@ -140,18 +199,34 @@
         button.addEventListener('click', () => {
           if (failed) return location.reload()
           skipped = true
-          if (mounted) finish()
-          else status.textContent = 'Preparing the page…'
+          status.textContent = 'Preparing the page…'
+          beginIntro()
         })
         window.addEventListener(
           'portfolio:mounted',
           () => {
             mounted = true
-            if (skipped) finish()
+            beginIntro()
           },
           { once: true },
         )
-        window.addEventListener('portfolio:ready', finish, { once: true })
+        window.addEventListener(
+          'portfolio:ready',
+          () => {
+            assetsReady = true
+            beginIntro()
+          },
+          { once: true },
+        )
+        window.addEventListener(
+          'portfolio:intro-started',
+          () => {
+            loader.setAttribute('aria-hidden', 'true')
+            loader.remove()
+          },
+          { once: true },
+        )
+        window.addEventListener('portfolio:complete', complete, { once: true })
       })()
     </script>
     <noscript
