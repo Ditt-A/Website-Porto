@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { images } from './assets/images'
-import WarpArrival from './components/WarpArrival.vue'
+import { usePortfolioMotion, type SpaceObject, type SkyObject } from './composables/usePortfolioMotion'
 
 type Project = {
   title: string
@@ -41,25 +40,6 @@ type ContactLink = {
   href: string
   viewBox: string
   paths: string[]
-}
-
-type SpaceObject = {
-  id: string
-  image: string
-  x: number
-  y: number
-  size: number
-  rotation: number
-  depth: number
-  speed: number
-  parallaxRange: number
-  opacity: number
-  duration: number
-}
-
-type SkyObject = SpaceObject & {
-  aspectRatio: number
-  mobileX: number
 }
 
 const spaceObjects: SpaceObject[] = [
@@ -373,485 +353,19 @@ const contactLinks: ContactLink[] = [
   },
 ]
 
-const scrollY = ref(0)
-const scrollProgress = ref(0)
-const activeSection = ref('home')
-const pointerX = ref(0)
-const pointerY = ref(0)
-const cursorX = ref(0)
-const cursorY = ref(0)
-const cursorVisible = ref(false)
-const cursorInteractive = ref(false)
-const cursorPressed = ref(false)
-const cursorAssetLoaded = ref(false)
-const prefersReducedMotion = ref(false)
-const introPlaying = ref(false)
-const introSessionKey = 'aditya-warp-arrival-v1'
-const spaceStage = ref<HTMLElement | null>(null)
-const spaceBounds = ref({ width: 0, height: 0, viewportHeight: 0 })
-const skyStage = ref<HTMLElement | null>(null)
-const skyBounds = ref({ width: 0, height: 0, top: 0, viewportHeight: 0 })
-const atmosphereStage = ref<HTMLElement | null>(null)
-const atmosphereBounds = ref({ top: 0, height: 0, viewportHeight: 0 })
-const experienceTimeline = ref<HTMLOListElement | null>(null)
-const timelineProgress = ref(0)
-// Keep timeline state in data attributes so Vue preserves the observer's reveal class.
-const activeExperience = ref(-1)
-
-let scrollFrame = 0
-let pointerFrame = 0
-let introTimer: number | undefined
-let revealObserver: IntersectionObserver | undefined
-let ambientBoundsObserver: ResizeObserver | undefined
-let sceneObserver: IntersectionObserver | undefined
-let motionPreference: MediaQueryList | undefined
-let finePointerPreference: MediaQueryList | undefined
-let activeGlareCard: HTMLElement | null = null
-let pointerCard: HTMLElement | null = null
-let timelineMetrics = { top: 0, height: 0, markers: [] as number[] }
-let sectionPositions: { id: string; top: number }[] = []
-let latestPointer = { x: 0, y: 0, clientX: 0, clientY: 0 }
-
-const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
-
-const updateAmbientBounds = () => {
-  // Cache section geometry on layout changes instead of reading layout on every scroll frame.
-  sectionPositions = sectionIds.flatMap((id) => {
-    const section = document.getElementById(id)
-    return section ? [{ id, top: section.getBoundingClientRect().top + window.scrollY }] : []
-  })
-
-  if (spaceStage.value) {
-    spaceBounds.value = {
-      width: spaceStage.value.clientWidth,
-      height: spaceStage.value.clientHeight,
-      viewportHeight: window.innerHeight,
-    }
-  }
-
-  if (skyStage.value) {
-    skyBounds.value = {
-      width: skyStage.value.clientWidth,
-      height: skyStage.value.clientHeight,
-      top: skyStage.value.getBoundingClientRect().top + window.scrollY,
-      viewportHeight: window.innerHeight,
-    }
-  }
-
-  if (atmosphereStage.value) {
-    atmosphereBounds.value = {
-      top: atmosphereStage.value.getBoundingClientRect().top + window.scrollY,
-      height: atmosphereStage.value.clientHeight,
-      viewportHeight: window.innerHeight,
-    }
-  }
-
-  if (experienceTimeline.value) {
-    timelineMetrics = {
-      top: experienceTimeline.value.getBoundingClientRect().top + window.scrollY + 12,
-      height: experienceTimeline.value.clientHeight - 24,
-      markers: [...experienceTimeline.value.querySelectorAll<HTMLElement>('.timeline-entry')].map((entry) => {
-        const marker = entry.querySelector<HTMLElement>('.timeline-marker')
-        return entry.offsetTop + (marker?.offsetTop ?? 40) + (marker?.offsetHeight ?? 14) / 2 - 12
-      }),
-    }
-  }
-
-  updateScrollPosition()
-}
-
-const spaceObjectStyle = (object: SpaceObject): Record<string, string> => {
-  const { width, height, viewportHeight } = spaceBounds.value
-  if (!width || !height) return { opacity: '0' }
-
-  const compact = width <= 820
-  const size = object.size * clamp(width / 1440, compact ? 0.46 : 0.6, 1)
-  const angle = ((Math.abs(object.rotation) + 3) * Math.PI) / 180
-  // Reserve room for the rotated corners and the child's gentle floating animation.
-  const inset = 16 + (size * (Math.cos(angle) + Math.sin(angle) - 1)) / 2 + 12
-  const baseX = width * object.x - size / 2
-  const isHeroObject = object.id === 'planet' || object.id === 'comet'
-  const baseY = compact && isHeroObject
-    ? viewportHeight * 0.105 - size / 2
-    : height * object.y - size / 2
-  const localScroll = scrollY.value - Math.max(0, baseY - viewportHeight / 2)
-  const scrollShift = prefersReducedMotion.value ? 0 : clamp(localScroll * object.speed, -object.parallaxRange, object.parallaxRange)
-  const pointerShiftX = prefersReducedMotion.value ? 0 : pointerX.value * object.depth
-  const pointerShiftY = prefersReducedMotion.value ? 0 : pointerY.value * object.depth * 0.7
-  const x = clamp(baseX + pointerShiftX, inset, Math.max(inset, width - size - inset))
-  const y = clamp(baseY + pointerShiftY + scrollShift, inset, Math.max(inset, height - size - inset))
-
-  return {
-    width: `${size.toFixed(1)}px`,
-    height: `${size.toFixed(1)}px`,
-    '--space-x': `${x.toFixed(1)}px`,
-    '--space-y': `${y.toFixed(1)}px`,
-    '--space-rotation': `${object.rotation}deg`,
-    '--space-opacity': String(object.opacity),
-    '--space-duration': `${object.duration}s`,
-    '--space-delay': `${-object.duration * 0.35}s`,
-  }
-}
-
-const skyObjectStyle = (object: SkyObject): Record<string, string> => {
-  const { width, height, top, viewportHeight } = skyBounds.value
-  if (!width || !height) return { opacity: '0' }
-
-  const compact = width <= 820
-  const objectWidth = object.size * clamp(width / 1440, compact ? 0.46 : 0.6, 1)
-  const objectHeight = objectWidth / object.aspectRatio
-  const angle = ((Math.abs(object.rotation) + 3) * Math.PI) / 180
-  const drift = object.id === 'cloud' ? (compact ? 14 : 32) : 6
-  // Reserve the complete animated envelope, including the sun's pulse and balloon's bob.
-  const insetX = 24 + drift + objectWidth * 0.04 + Math.max(0, (objectWidth * Math.cos(angle) + objectHeight * Math.sin(angle) - objectWidth) / 2)
-  const insetY = 40 + objectHeight * 0.04 + Math.max(0, (objectHeight * Math.cos(angle) + objectWidth * Math.sin(angle) - objectHeight) / 2)
-  const flying = !prefersReducedMotion.value && (object.id === 'plane' || object.id === 'birds')
-  const baseX = flying ? insetX : width * (compact ? object.mobileX : object.x) - objectWidth / 2
-  const baseY = height * object.y - objectHeight / 2
-  const localScroll = scrollY.value - Math.max(0, top + baseY - viewportHeight / 2)
-  const scrollShift = prefersReducedMotion.value ? 0 : clamp(localScroll * object.speed, -object.parallaxRange, object.parallaxRange)
-  const pointerShiftX = prefersReducedMotion.value ? 0 : pointerX.value * object.depth
-  const pointerShiftY = prefersReducedMotion.value ? 0 : pointerY.value * object.depth * 0.6
-  const x = clamp(baseX + pointerShiftX, insetX, Math.max(insetX, width - objectWidth - insetX))
-  const y = clamp(baseY + pointerShiftY + scrollShift, insetY, Math.max(insetY, height - objectHeight - insetY))
-
-  return {
-    width: `${objectWidth.toFixed(1)}px`,
-    height: `${objectHeight.toFixed(1)}px`,
-    '--sky-x': `${x.toFixed(1)}px`,
-    '--sky-y': `${y.toFixed(1)}px`,
-    '--sky-rotation': `${object.rotation}deg`,
-    '--sky-opacity': String(object.opacity),
-    '--sky-duration': `${object.duration}s`,
-    '--sky-delay': `${-object.duration * 0.35}s`,
-    '--sky-drift': `${drift}px`,
-    '--sky-flight-distance': `${Math.max(0, width - objectWidth - insetX - x).toFixed(1)}px`,
-  }
-}
-
-const atmosphereProgress = computed(() => {
-  const { top, height, viewportHeight } = atmosphereBounds.value
-  return height ? clamp((scrollY.value + viewportHeight * 0.65 - top) / height, 0, 1) : 0
-})
-
-const atmosphereStyle = computed<Record<string, string>>(() => {
-  const { top, height, viewportHeight } = atmosphereBounds.value
-  const localScroll = scrollY.value + viewportHeight * 0.5 - top - height * 0.5
-  const reduced = prefersReducedMotion.value
-
-  return {
-    '--haze-opacity': (reduced ? 0.55 : 0.3 + atmosphereProgress.value * 0.55).toFixed(3),
-    '--atmosphere-far-y': `${reduced ? 0 : clamp(localScroll * -0.035, -50, 50)}px`,
-    '--atmosphere-near-y': `${reduced ? 0 : clamp(localScroll * -0.1, -110, 110)}px`,
-  }
-})
-
-const clearGlassGlare = () => {
-  activeGlareCard?.style.setProperty('--glare-active', '0')
-  activeGlareCard = null
-}
-
-const updateGlassGlare = () => {
-  if (activeGlareCard !== pointerCard) clearGlassGlare()
-  if (!pointerCard || !finePointerPreference?.matches || prefersReducedMotion.value) return
-
-  activeGlareCard = pointerCard
-  const bounds = activeGlareCard.getBoundingClientRect()
-  if (!bounds.width || !bounds.height) return
-  activeGlareCard.style.setProperty('--glare-x', `${(clamp((latestPointer.clientX - bounds.left) / bounds.width, 0, 1) * 100).toFixed(2)}%`)
-  activeGlareCard.style.setProperty('--glare-y', `${(clamp((latestPointer.clientY - bounds.top) / bounds.height, 0, 1) * 100).toFixed(2)}%`)
-  activeGlareCard.style.setProperty('--glare-active', '1')
-}
-
-const interactiveSelector = [
-  'a',
-  'button',
-  'summary',
-  '.project-card',
-  '.stack-card',
-  '.experience-item',
-  '.service-item',
-  '.focus-pills span',
-  '.stat-item',
-].join(',')
-
-const updateScrollPosition = () => {
-  if (introPlaying.value && window.scrollY > 8) finishIntro()
-  if (scrollFrame) return
-
-  scrollFrame = window.requestAnimationFrame(() => {
-    const scrollable = document.documentElement.scrollHeight - window.innerHeight
-    const activeOffset = window.innerHeight * 0.34
-    let currentSection = sectionIds[0] ?? 'home'
-
-    scrollY.value = window.scrollY
-    scrollProgress.value = scrollable > 0 ? clamp(window.scrollY / scrollable, 0, 1) : 0
-
-    const timelineHead = scrollY.value + window.innerHeight * 0.62 - timelineMetrics.top
-    timelineProgress.value = timelineMetrics.height > 0 ? clamp(timelineHead / timelineMetrics.height, 0, 1) : 0
-    let reached = -1
-    timelineMetrics.markers.forEach((position, index) => {
-      if (timelineHead >= position) reached = index
-    })
-    activeExperience.value = reached
-
-    sectionPositions.forEach(({ id, top }) => {
-      if (top <= scrollY.value + activeOffset) {
-        currentSection = id
-      }
-    })
-
-    activeSection.value = currentSection
-    scrollFrame = 0
-  })
-}
-
-const updatePointerPosition = (event: PointerEvent) => {
-  if (prefersReducedMotion.value || event.pointerType === 'touch') return
-
-  const { clientX, clientY } = event
-  const viewport = document.documentElement
-  if (clientX < 0 || clientY < 0 || clientX >= viewport.clientWidth || clientY >= viewport.clientHeight) {
-    resetPointerPosition()
-    return
-  }
-
-  const target = event.type === 'pointerenter' ? document.elementFromPoint(clientX, clientY) : event.target
-  cursorInteractive.value = target instanceof Element && Boolean(target.closest(interactiveSelector))
-  pointerCard = target instanceof Element ? target.closest<HTMLElement>('.glass-card') : null
-
-  latestPointer = {
-    x: (event.clientX / window.innerWidth - 0.5) * 2,
-    y: (event.clientY / window.innerHeight - 0.5) * 2,
-    clientX: event.clientX,
-    clientY: event.clientY,
-  }
-
-  if (pointerFrame) return
-
-  pointerFrame = window.requestAnimationFrame(() => {
-    pointerX.value = clamp(latestPointer.x, -1, 1)
-    pointerY.value = clamp(latestPointer.y, -1, 1)
-    cursorX.value = latestPointer.clientX
-    cursorY.value = latestPointer.clientY
-    cursorVisible.value = cursorAssetLoaded.value && Boolean(finePointerPreference?.matches)
-    updateGlassGlare()
-    pointerFrame = 0
-  })
-}
-
-const resetPointerPosition = () => {
-  if (pointerFrame) {
-    window.cancelAnimationFrame(pointerFrame)
-    pointerFrame = 0
-  }
-
-  pointerX.value = 0
-  pointerY.value = 0
-  cursorX.value = -120
-  cursorY.value = -120
-  cursorVisible.value = false
-  cursorInteractive.value = false
-  cursorPressed.value = false
-  pointerCard = null
-  clearGlassGlare()
-}
-
-const handlePointerOut = (event: PointerEvent) => {
-  // pointerout bubbles from the page; pointerleave on window does not.
-  if (event.relatedTarget === null) resetPointerPosition()
-}
-
-const handlePageVisibility = () => {
-  if (document.hidden) {
-    resetPointerPosition()
-    finishIntro()
-  }
-}
-
-const finishIntro = () => {
-  introPlaying.value = false
-  if (introTimer !== undefined) window.clearTimeout(introTimer)
-  introTimer = undefined
-  document.removeEventListener('keydown', handleIntroKeydown)
-}
-
-const handleIntroKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' || event.key === 'Tab') finishIntro()
-}
-
-const startIntro = () => {
-  if (prefersReducedMotion.value || window.location.pathname !== '/') return
-  if ((window.location.hash && window.location.hash !== '#home') || window.scrollY > 16) return
-
-  try {
-    if (window.sessionStorage.getItem(introSessionKey) === 'seen') return
-    window.sessionStorage.setItem(introSessionKey, 'seen')
-  } catch {
-    // Storage restrictions must never prevent access to the page.
-  }
-
-  introPlaying.value = true
-  document.addEventListener('keydown', handleIntroKeydown)
-  // Fallback for interrupted or disabled CSS animation events.
-  introTimer = window.setTimeout(finishIntro, 2300)
-}
-
-const updateMotionPreference = () => {
-  prefersReducedMotion.value = motionPreference?.matches ?? false
-  if (prefersReducedMotion.value) {
-    resetPointerPosition()
-    finishIntro()
-  }
-  updateScrollPosition()
-}
-
-const setCursorPressed = () => {
-  if (introPlaying.value) finishIntro()
-  cursorPressed.value = true
-}
-
-const releaseCursorPressed = () => {
-  cursorPressed.value = false
-}
-
-const parallaxStyle = (speed: number, limit = 180): Record<string, string> => {
-  const y = prefersReducedMotion.value ? 0 : clamp(scrollY.value * speed, -limit, limit)
-
-  return {
-    '--parallax-y': `${y.toFixed(1)}px`,
-  }
-}
-
-const revealDelay = (index: number, step = 80): Record<string, string> => ({
-  '--reveal-delay': `${index * step}ms`,
-})
-
-const shellStyle = computed<Record<string, string>>(() => ({
-  '--scroll-progress': scrollProgress.value.toFixed(4),
-  '--pointer-x': pointerX.value.toFixed(3),
-  '--pointer-y': pointerY.value.toFixed(3),
-  '--pointer-soft-x': `${(pointerX.value * 18).toFixed(1)}px`,
-  '--pointer-soft-y': `${(pointerY.value * 14).toFixed(1)}px`,
-  '--pointer-soft-x-inverse': `${(pointerX.value * -18).toFixed(1)}px`,
-  '--pointer-soft-y-inverse': `${(pointerY.value * -14).toFixed(1)}px`,
-  '--cursor-x': `${cursorX.value.toFixed(1)}px`,
-  '--cursor-y': `${cursorY.value.toFixed(1)}px`,
-  '--cursor-opacity': cursorAssetLoaded.value && cursorVisible.value && !prefersReducedMotion.value ? '1' : '0',
-  '--cursor-tool-scale': cursorPressed.value ? '0.94' : cursorInteractive.value ? '1.04' : '1',
-  '--cursor-light-scale': cursorPressed.value ? '0.6' : cursorInteractive.value ? '1.85' : '0.72',
-  '--cursor-light-opacity': cursorInteractive.value ? '0.72' : '0.38',
-  '--grid-y': `${(scrollY.value * -0.08).toFixed(1)}px`,
-  '--star-opacity': (prefersReducedMotion.value ? 0.75 : 0.75 * (1 - atmosphereProgress.value)).toFixed(3),
-}))
-
-const heroVisualStyle = computed<Record<string, string>>(() => ({
-  ...parallaxStyle(-0.045, 70),
-  '--tilt-x': `${(-pointerY.value * 4).toFixed(2)}deg`,
-  '--tilt-y': `${(pointerX.value * 5).toFixed(2)}deg`,
-}))
-
-const projectRevealStyle = (index: number): Record<string, string> => ({
-  ...revealDelay(index, 85),
-  '--card-depth': `${index % 2 === 0 ? 1 : -1}`,
-  '--project-shift-x': `${(pointerX.value * (index % 2 === 0 ? 8 : -8)).toFixed(1)}px`,
-  '--project-shift-y': `${(pointerY.value * (index % 2 === 0 ? -6 : 6)).toFixed(1)}px`,
-  '--preview-shift-x': `${(pointerX.value * (index % 2 === 0 ? -12 : 12)).toFixed(1)}px`,
-  '--preview-shift-y': `${(pointerY.value * (index % 2 === 0 ? 8 : -8)).toFixed(1)}px`,
-  '--project-tilt-y': `${(index % 2 === 0 ? -2 : 2).toFixed(1)}deg`,
-})
-
-onMounted(() => {
-  motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
-  finePointerPreference = window.matchMedia('(hover: hover) and (pointer: fine)')
-  updateMotionPreference()
-  startIntro()
-  motionPreference.addEventListener('change', updateMotionPreference)
-  finePointerPreference.addEventListener('change', resetPointerPosition)
-
-  updateAmbientBounds()
-  ambientBoundsObserver = new ResizeObserver(updateAmbientBounds)
-  if (spaceStage.value) ambientBoundsObserver.observe(spaceStage.value)
-  if (skyStage.value) ambientBoundsObserver.observe(skyStage.value)
-  if (atmosphereStage.value) ambientBoundsObserver.observe(atmosphereStage.value)
-  if (experienceTimeline.value) ambientBoundsObserver.observe(experienceTimeline.value)
-  window.addEventListener('resize', updateAmbientBounds, { passive: true })
-
-  window.addEventListener('scroll', updateScrollPosition, { passive: true })
-  window.addEventListener('pointermove', updatePointerPosition, { passive: true })
-  document.documentElement.addEventListener('pointerenter', updatePointerPosition)
-  document.documentElement.addEventListener('pointerleave', resetPointerPosition)
-  document.addEventListener('pointerout', handlePointerOut)
-  document.addEventListener('visibilitychange', handlePageVisibility)
-  window.addEventListener('blur', resetPointerPosition)
-  window.addEventListener('pointerdown', setCursorPressed)
-  window.addEventListener('pointerup', releaseCursorPressed)
-  updateScrollPosition()
-
-  revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return
-
-        entry.target.classList.add('is-visible')
-        revealObserver?.unobserve(entry.target)
-      })
-    },
-    {
-      rootMargin: '0px 0px -10%',
-      threshold: 0.14,
-    },
-  )
-
-  document.querySelectorAll('[data-reveal]').forEach((element) => {
-    revealObserver?.observe(element)
-  })
-
-  sceneObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => entry.target.toggleAttribute('data-motion-active', entry.isIntersecting))
-  }, { rootMargin: '120px', threshold: 0 })
-  document.querySelectorAll('.ambient-stage, .atmosphere-stage, .sky-stage, .landscape-hills, .hero-section, .editorial-band, .project-card').forEach((element) => {
-    sceneObserver?.observe(element)
-  })
-})
-
-onUnmounted(() => {
-  finishIntro()
-  window.removeEventListener('resize', updateAmbientBounds)
-  window.removeEventListener('scroll', updateScrollPosition)
-  window.removeEventListener('pointermove', updatePointerPosition)
-  document.documentElement.removeEventListener('pointerenter', updatePointerPosition)
-  document.documentElement.removeEventListener('pointerleave', resetPointerPosition)
-  document.removeEventListener('pointerout', handlePointerOut)
-  document.removeEventListener('visibilitychange', handlePageVisibility)
-  window.removeEventListener('blur', resetPointerPosition)
-  window.removeEventListener('pointerdown', setCursorPressed)
-  window.removeEventListener('pointerup', releaseCursorPressed)
-  revealObserver?.disconnect()
-  ambientBoundsObserver?.disconnect()
-  sceneObserver?.disconnect()
-  motionPreference?.removeEventListener('change', updateMotionPreference)
-  finePointerPreference?.removeEventListener('change', resetPointerPosition)
-  clearGlassGlare()
-
-  if (scrollFrame) {
-    window.cancelAnimationFrame(scrollFrame)
-  }
-
-  if (pointerFrame) {
-    window.cancelAnimationFrame(pointerFrame)
-  }
-})
+const {
+  portfolioShell, spaceStage, skyStage, atmosphereStage, experienceTimeline,
+  activeSection, activeExperience, prefersReducedMotion,
+  revealDelay, projectRevealStyle, handleCursorLoad, handleCursorError, handleProjectImageLoad,
+} = usePortfolioMotion({ sectionIds, spaceObjects, skyObjects })
 </script>
 
 <template>
   <div
     class="portfolio-shell"
-    :style="shellStyle"
-    :data-custom-cursor="cursorAssetLoaded && cursorVisible && !prefersReducedMotion"
-    :data-intro="introPlaying ? 'playing' : 'ready'"
+    ref="portfolioShell"
+    data-custom-cursor="false"
   >
-    <WarpArrival v-if="introPlaying" @complete="finishIntro" />
     <div class="scroll-progress" aria-hidden="true">
       <span></span>
     </div>
@@ -865,8 +379,8 @@ onUnmounted(() => {
         height="192"
         decoding="async"
         draggable="false"
-        @load="cursorAssetLoaded = true"
-        @error="cursorAssetLoaded = false"
+        @load="handleCursorLoad"
+        @error="handleCursorError"
       />
     </div>
 
@@ -876,7 +390,6 @@ onUnmounted(() => {
         :key="object.id"
         class="space-object"
         :class="`space-${object.id}`"
-        :style="spaceObjectStyle(object)"
       >
         <img
           :src="object.image"
@@ -889,7 +402,7 @@ onUnmounted(() => {
       </span>
     </div>
 
-    <div ref="atmosphereStage" class="atmosphere-stage" :style="atmosphereStyle" aria-hidden="true">
+    <div ref="atmosphereStage" class="atmosphere-stage" aria-hidden="true">
       <span class="atmosphere-haze"></span>
       <span class="atmosphere-cloud atmosphere-cloud-far">
         <img :src="images.skyCloud" alt="" loading="lazy" decoding="async" draggable="false" />
@@ -905,7 +418,6 @@ onUnmounted(() => {
         :key="object.id"
         class="sky-object"
         :class="`sky-${object.id}`"
-        :style="skyObjectStyle(object)"
       >
         <img :src="object.image" alt="" loading="lazy" decoding="async" draggable="false" />
       </span>
@@ -1038,7 +550,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="hero-visual" :style="heroVisualStyle" aria-label="Aditya Akbar portrait">
+        <div class="hero-visual" aria-label="Aditya Akbar portrait">
           <img
             :src="images.profile"
             :srcset="`${images.profile} 1x, ${images.profileRetina} 2x`"
@@ -1099,7 +611,7 @@ onUnmounted(() => {
             </p>
           </div>
 
-          <div class="terminal-card" :style="parallaxStyle(-0.025, 48)">
+          <div class="terminal-card">
             <div class="terminal-bar">
               <span></span>
               <span></span>
@@ -1227,7 +739,6 @@ output    : Research Projects & AI Applications</code></pre>
         <ol
           ref="experienceTimeline"
           class="experience-timeline"
-          :style="{ '--timeline-progress': prefersReducedMotion ? '1' : timelineProgress.toFixed(4) }"
           aria-label="Professional experience, earliest to most recent"
         >
           <li
@@ -1294,6 +805,7 @@ output    : Research Projects & AI Applications</code></pre>
             <div class="project-preview" aria-hidden="true">
               <img
                 class="project-image"
+                @load="handleProjectImageLoad"
                 :src="project.image"
                 alt=""
                 loading="lazy"

@@ -1,16 +1,170 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-loading>
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico?v=20261027">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261027">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Aditya Akbar builds applied AI systems across RAG, computer vision, NLP, and time-series forecasting." />
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico?v=20261027" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicon-32.png?v=20261027"
+    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Aditya Akbar builds applied AI systems across RAG, computer vision, NLP, and time-series forecasting."
+    />
     <title>Aditya Akbar</title>
+    <style>
+      html[data-loading] {
+        overflow: hidden;
+        background: #050505;
+      }
+      #page-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 22px;
+        margin: 0;
+        background: #050505;
+        color: #f7f7f8;
+        font-family: system-ui, sans-serif;
+        transition: opacity 240ms ease;
+      }
+      #page-loader.is-leaving {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .loader-name {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+      }
+      .loader-track {
+        width: 136px;
+        height: 2px;
+        overflow: hidden;
+        background: #272727;
+      }
+      .loader-track span {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #d7d7d7;
+        transform-origin: left;
+        animation: loaderSweep 1.2s ease-in-out infinite;
+      }
+      #loader-status {
+        margin: 0;
+        font-size: 12px;
+        color: #aaa;
+      }
+      #loader-open {
+        padding: 8px 12px;
+        border: 1px solid #363636;
+        border-radius: 4px;
+        background: transparent;
+        color: #c9c9c9;
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      #loader-open:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 4px;
+      }
+      @keyframes loaderSweep {
+        0% {
+          transform: translateX(-100%) scaleX(0.4);
+        }
+        100% {
+          transform: translateX(100%) scaleX(0.4);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #page-loader {
+          transition: none;
+        }
+        .loader-track span {
+          animation: none;
+          transform: scaleX(0.5);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="page-loader" role="status" aria-live="polite">
+      <span class="loader-name">Aditya Akbar</span>
+      <div class="loader-track" aria-hidden="true"><span></span></div>
+      <p id="loader-status">Loading portfolio…</p>
+      <button id="loader-open" type="button">Open now</button>
+    </div>
+    <div id="app" aria-busy="true" inert></div>
+    <script>
+      ;(() => {
+        const loader = document.getElementById('page-loader')
+        const app = document.getElementById('app')
+        const button = document.getElementById('loader-open')
+        const status = document.getElementById('loader-status')
+        let mounted = false,
+          skipped = false,
+          failed = false,
+          finished = false
+        const finish = () => {
+          if (!mounted || finished) return
+          finished = true
+          clearTimeout(fallback)
+          document.documentElement.removeAttribute('data-loading')
+          app.removeAttribute('inert')
+          app.setAttribute('aria-busy', 'false')
+          if (document.activeElement === button) {
+            const heading = app.querySelector('h1')
+            heading?.setAttribute('tabindex', '-1')
+            heading?.focus({ preventScroll: true })
+          }
+          loader.setAttribute('aria-hidden', 'true')
+          loader.classList.add('is-leaving')
+          setTimeout(() => loader.remove(), 260)
+        }
+        const fallback = setTimeout(() => {
+          if (mounted) return finish()
+          failed = true
+          status.textContent = 'The page could not load. Please try again.'
+          button.textContent = 'Reload'
+          loader.querySelector('.loader-track').hidden = true
+        }, 12000)
+        button.addEventListener('click', () => {
+          if (failed) return location.reload()
+          skipped = true
+          if (mounted) finish()
+          else status.textContent = 'Preparing the page…'
+        })
+        window.addEventListener(
+          'portfolio:mounted',
+          () => {
+            mounted = true
+            if (skipped) finish()
+          },
+          { once: true },
+        )
+        window.addEventListener('portfolio:ready', finish, { once: true })
+      })()
+    </script>
+    <noscript
+      ><style>
+        #page-loader {
+          display: none;
+        }
+      </style>
+      <p>
+        This portfolio needs JavaScript. You can also find me on
+        <a href="https://github.com/Ditt-A">GitHub</a>.
+      </p></noscript
+    >
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

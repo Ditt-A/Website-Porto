@@ -46,7 +46,13 @@ npm run build
 - Runtime raster images use resized WebP files, including transparent sky/space assets. The profile photo has 1x/2x variants and high fetch priority; lower-page images use lazy loading.
 - Images are imported from `src/assets/images.ts`, producing content-hashed URLs under `/assets/` instead of fixed public filenames.
 - `vercel.json` caches hashed assets for one year with `immutable`. HTML is revalidated on every visit, so a new deployment can reference new assets immediately. Unversioned favicons and the downloadable CV use shorter cache lifetimes.
-- Offscreen decorative, marquee, portrait-panel, and project-preview animations pause. Section geometry is refreshed when layout changes instead of being read on every scroll frame.
+- A black startup screen is present in the initial HTML. It fades after Vue mounts and the main portrait/fonts are ready. The portrait wait is capped at 3.5 seconds; **Open now** skips it. A failed JavaScript load exposes a retry instead of an endless spinner.
+- Pointer and scroll frames update scoped styles on visible elements, outside Vue render state. Unchanged values are skipped; cursor coordinates never propagate through the page root.
+- Individual offscreen decorations, marquee, portrait-panel, and project-preview animations pause, including while the tab is hidden. Loaded project images stop their hidden placeholder animations.
+- Section geometry is refreshed after layout/size changes. Card bounds are read on entry, before frame writes. Full-page animated star repainting and the oversized warp opening have been removed.
+- Large cards use their existing color tint without a live backdrop blur. Mobile navigation/portrait overlays use a cheaper rendering path.
 - Reduced motion and native cursor fallbacks remain available.
 
 See `src/assets/images/README.md` for the image inventory and original-file locations.
+
+Measured results and verification scope: [docs/PERFORMANCE.md](docs/PERFORMANCE.md).

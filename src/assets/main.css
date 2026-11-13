@@ -29,9 +29,9 @@
     radial-gradient(1px 1px at 72% 66%, rgba(234, 245, 255, 0.65) 98%, transparent),
     radial-gradient(1.5px 1.5px at 44% 80%, rgba(183, 216, 255, 0.8) 98%, transparent),
     radial-gradient(1px 1px at 84% 12%, rgba(234, 245, 255, 0.7) 98%, transparent);
-  background-position: center var(--grid-y, 0);
+  background-position: center 0;
   background-size: 347px 281px, 487px 431px, 613px 557px, 797px 683px;
-  opacity: var(--star-opacity, 0.75);
+  opacity: 0.75;
   mask-image: linear-gradient(to bottom, black 75%, transparent);
 }
 
@@ -169,7 +169,6 @@
   opacity: var(--space-opacity, 0.65);
   transform: translate3d(var(--space-x, 0px), var(--space-y, 0px), 0)
     rotate(var(--space-rotation, 0deg));
-  will-change: transform;
 }
 
 .space-object img {
@@ -207,7 +206,6 @@
 .atmosphere-cloud {
   position: absolute;
   display: block;
-  will-change: transform;
 }
 
 .atmosphere-cloud img {
@@ -253,7 +251,6 @@
   opacity: var(--sky-opacity, 0.5);
   transform: translate3d(var(--sky-x, 0px), var(--sky-y, 0px), 0)
     rotate(var(--sky-rotation, 0deg));
-  will-change: transform;
 }
 
 .sky-object img {
@@ -282,9 +279,6 @@
   animation-name: sunPulse;
 }
 
-.ambient-stage:not([data-motion-active]) .space-object img,
-.atmosphere-stage:not([data-motion-active]) .atmosphere-cloud img,
-.sky-stage:not([data-motion-active]) .sky-object img,
 .landscape-hills:not([data-motion-active]) .tree-sway,
 .landscape-hills:not([data-motion-active]) .grass-sway,
 .hero-section:not([data-motion-active]) :is(.availability-panel, .status-dot),
@@ -399,16 +393,11 @@
 
 [data-reveal] {
   opacity: 0;
-  filter: blur(12px);
-  clip-path: inset(12% 0 0 0);
   transform: translate3d(0, 44px, 0) scale(0.985);
   transition:
     opacity 720ms ease,
-    filter 720ms ease,
-    clip-path 720ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
 }
 
 [data-reveal].is-visible {
@@ -511,38 +500,6 @@ summary:hover .rolling-text span {
   transform: none;
 }
 
-.portfolio-shell[data-intro="playing"] :is(.hero-copy > .eyebrow, .hero-copy h1, .hero-lede, .focus-pills, .hero-actions) {
-  animation: heroRise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.portfolio-shell[data-intro="playing"] .hero-copy > .eyebrow {
-  animation-delay: 1000ms;
-}
-
-.portfolio-shell[data-intro="playing"] .hero-copy h1 {
-  animation: warpTitleIn 680ms 1080ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.portfolio-shell[data-intro="playing"] .hero-lede {
-  animation-delay: 1260ms;
-}
-
-.portfolio-shell[data-intro="playing"] .focus-pills {
-  animation-delay: 1340ms;
-}
-
-.portfolio-shell[data-intro="playing"] .hero-actions {
-  animation-delay: 1420ms;
-}
-
-.portfolio-shell[data-intro="playing"] .hero-visual {
-  animation: portraitEnter 700ms 1180ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.portfolio-shell[data-intro="playing"] .site-nav {
-  animation: navDrop 560ms 1320ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
 .focus-pills,
 .tag-list,
 .hero-actions,
@@ -638,7 +595,6 @@ summary:hover .rolling-text span {
     rotateX(var(--tilt-x, 0deg))
     rotateY(var(--tilt-y, 0deg));
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
 .hero-visual::before {
@@ -721,7 +677,7 @@ summary:hover .rolling-text span {
   border-radius: 50%;
   box-shadow: 0 0 0 6px rgba(31, 169, 113, 0.14);
   flex: 0 0 auto;
-  animation: statusPulse 1.8s ease-in-out infinite;
+  position: relative;
 }
 
 .stats-band {
@@ -873,8 +829,6 @@ summary:hover .rolling-text span {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(18px);
-  will-change: transform;
 }
 
 .terminal-bar {
@@ -1379,11 +1333,9 @@ summary:hover .rolling-text span {
   box-shadow: 0 18px 42px rgba(5, 30, 54, 0.16);
   backdrop-filter: blur(12px);
   opacity: 0;
-  filter: blur(5px);
   transform: translate3d(var(--timeline-enter-x), 0, 0);
   transition:
     opacity 650ms ease,
-    filter 650ms ease,
     transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
     border-color 260ms ease,
     box-shadow 260ms ease;
@@ -1532,13 +1484,11 @@ summary:hover .rolling-text span {
   border: 1px solid rgba(222, 242, 255, 0.28);
   border-radius: 14px;
   box-shadow: 0 18px 46px rgba(9, 40, 68, 0.18);
-  backdrop-filter: blur(16px);
   transform-style: preserve-3d;
   isolation: isolate;
   transition:
     transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 320ms ease;
-  will-change: transform;
 }
 
 .project-card::before {
@@ -1835,60 +1785,6 @@ summary:hover .rolling-text span {
   transform: translate3d(0, -1px, 0) scale(1.08);
 }
 
-@keyframes navDrop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -18px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-@keyframes heroRise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 28px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes portraitEnter {
-  from {
-    opacity: 0;
-    transform: translate3d(34px, 42px, 0)
-      rotateX(var(--tilt-x, 0deg))
-      rotateY(var(--tilt-y, 0deg))
-      scale(1.06);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, var(--parallax-y, 0px), 0)
-      rotateX(var(--tilt-x, 0deg))
-      rotateY(var(--tilt-y, 0deg))
-      scale(1);
-  }
-}
-
-@keyframes warpTitleIn {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 22px, 0) scale(0.94);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
 @keyframes panelFloat {
   0%,
   100% {
@@ -1901,14 +1797,8 @@ summary:hover .rolling-text span {
 }
 
 @keyframes statusPulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 6px rgba(31, 169, 113, 0.14);
-  }
-
-  50% {
-    box-shadow: 0 0 0 10px rgba(31, 169, 113, 0.06);
-  }
+  from { transform: scale(0.7); opacity: 0.65; }
+  to { transform: scale(1.45); opacity: 0; }
 }
 
 @keyframes spaceFloat {
@@ -2409,4 +2299,34 @@ summary:hover .rolling-text span {
   .timeline-entry::before {
     opacity: 1;
   }
+}
+
+/* Keep animation work local to a visible object, including large ambient stages. */
+.space-object:not([data-motion-active]) img,
+.sky-object:not([data-motion-active]) img,
+.atmosphere-cloud:not([data-motion-active]) img,
+.hero-section:not([data-motion-active]) .status-dot::after,
+.portfolio-shell[data-page-hidden] *,
+.portfolio-shell[data-page-hidden] *::before,
+.portfolio-shell[data-page-hidden] *::after {
+  animation-play-state: paused !important;
+}
+.status-dot::after {
+  position: absolute;
+  inset: -6px;
+  content: "";
+  border: 1px solid rgba(54, 211, 153, 0.5);
+  border-radius: 50%;
+  animation: statusPulse 1.8s ease-out infinite;
+}
+.project-preview[data-image-loaded]::before,
+.project-preview[data-image-loaded] .preview-lines span {
+  animation: none;
+}
+.project-preview[data-image-loaded] :is(.preview-lines, .preview-window) {
+  visibility: hidden;
+}
+@media (hover: none), (pointer: coarse) {
+  .site-nav, .availability-panel { backdrop-filter: none; }
+  .tree-sway, .grass-sway { animation: none; }
 }
